@@ -1,0 +1,73 @@
+.scroll_scrollContainer {
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+@mixin transition {
+    transition: opacity 0.5s linear, pointer-events 0.5s linear, visibility 0.5s linear;
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+.scroll_scrollBar__vertical {
+    background-color: #d5d5d5;
+    border-radius: 1.5px;
+    width: 8px;
+    position: absolute;
+    cursor: pointer;
+
+    right: 0;
+    top: 0;
+    z-index: 50;
+    @include transition();
+    &.active {
+        opacity: 1;
+
+        pointer-events: initial;
+        visibility: visible;
+    }
+}
+
+.scroll_scrollBar__horizontal {
+    background-color: #d5d5d5;
+    border-radius: 1.5px;
+    position: absolute;
+    cursor: pointer;
+    left: 0;
+    bottom: 0;
+    z-index: 50;
+    height: 8px;
+
+    @include transition();
+    &.active {
+        opacity: 1;
+        pointer-events: initial;
+        visibility: visible;
+    }
+}
+
+.scroll_scrollBarContainer {
+    position: absolute;
+    z-index: -1;
+    overflow: auto;
+    width: 5rem;
+    height: 5rem;
+    pointer-events: none;
+}
+
+.scroll_scrollBody {
+    overflow: auto;
+    width: 100%;
+    height: 100%;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    box-sizing: border-box;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
