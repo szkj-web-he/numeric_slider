@@ -9,6 +9,7 @@ options: [
         #     { "code": "b", "content": "B. 您觉得下列物品中，你喜欢哪些？" },
         # ],
         # [
+        # "<s>T</s><div>恤</div>"
         { "code": "1", "content": "T恤" },
         { "code": "2", "content": "短袖" },
         { "code": "3", "content": "长裤" },
@@ -46,6 +47,6 @@ options: [
         # ],
     ]
 
-totalScore: 100000
+totalScore: 1000
 
 optionsInstruction: "请进行拖拽打分"

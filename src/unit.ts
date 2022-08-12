@@ -6,6 +6,7 @@
  */
 
 import { comms } from ".";
+import { OptionProps, ScoreOption } from "./type";
 
 export const deepCloneData = <T>(data: T): T => {
     return JSON.parse(JSON.stringify(data)) as T;
@@ -37,8 +38,20 @@ export interface ScaleProps {
 
 /**
  * 当 最大刻度值比视口小 时
+ * @param margin 两个刻度之间最小距离
+ * @param total 容器的总尺寸
+ * @param score 总分
+ * @returns {scale:ScaleProps[],margin:number,incrementVal:number,v:number}
+ * scale => 刻度列表
+ * margin => 每个刻度之间的像素距离
+ * incrementVal => 每个刻度之间相差的分数
+ * v => 一分 需要多少像素
  */
-const normalScale = (margin: number, total: number, score: number) => {
+const normalScale = (
+    margin: number,
+    total: number,
+    score: number,
+): { scale: ScaleProps[]; margin: number; incrementVal: number; v: number } => {
     const arr: ScaleProps[] = [
         {
             value: 0,
@@ -80,17 +93,14 @@ const normalScale = (margin: number, total: number, score: number) => {
             });
         }
     }
-    return { scale: arr, margin: d * incrementVal };
+    return { scale: arr, margin: d * incrementVal, incrementVal, v: d };
 };
 
 /**
  * 设置刻度值
  */
 export const setScale = ():
-    | {
-          scale: ScaleProps[];
-          margin: number;
-      }
+    | { scale: ScaleProps[]; margin: number; incrementVal: number; v: number }
     | undefined => {
     if (!comms.config.totalScore) {
         return;
@@ -104,4 +114,47 @@ export const setScale = ():
     const { totalScore } = comms.config;
 
     return normalScale(minMargin, total, totalScore);
+};
+
+/**
+ * 将选中的需要评分的选项转化为
+ * 分数: 选项
+ * 格式的方法
+ *
+ *
+ */
+
+interface ScoreOptions {
+    score: number;
+    options: OptionProps[];
+}
+
+export const transformScoreOptions = (res: ScoreOption[]): ScoreOptions[] => {
+    const data: Record<string, OptionProps[]> = {};
+
+    for (let i = 0; i < res.length; i++) {
+        const item = res[i];
+        if (data[item.score]) {
+            data[item.score].push({
+                code: item.code,
+                content: item.content,
+            });
+        } else {
+            data[item.score] = [
+                {
+                    code: item.code,
+                    content: item.content,
+                },
+            ];
+        }
+    }
+
+    const arr: Array<{ score: number; options: OptionProps[] }> = [];
+    for (const key in data) {
+        arr.push({
+            score: Number(key),
+            options: data[key],
+        });
+    }
+    return arr;
 };

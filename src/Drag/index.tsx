@@ -6,10 +6,8 @@
  */
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import React, { forwardRef, useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import React, { forwardRef, useRef, useState } from "react";
 import { stopSelect } from "../Scroll/Unit/noSelected";
-import { BoxItem, useDragContext } from "../dragContext";
 import { DragMoveProps, DragPramsProps, PointProps } from "../type";
 import { getScrollValue } from "../unit";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
@@ -23,10 +21,6 @@ export interface DragProps extends React.HTMLAttributes<HTMLDivElement> {
     handleDragEnd?: (res: DragPramsProps) => void;
 
     children?: React.ReactNode;
-
-    portalClassName?: string;
-
-    portalStyle?: React.CSSProperties;
 
     activeClassName?: string;
 }
@@ -45,9 +39,9 @@ export const Drag = forwardRef<HTMLDivElement, DragProps>(
             onTouchMove,
             onTouchEnd,
             activeClassName,
-            portalClassName,
-            portalStyle,
             className,
+            onFocus,
+            onBlur,
             ...props
         },
         ref,
@@ -70,69 +64,15 @@ export const Drag = forwardRef<HTMLDivElement, DragProps>(
             height: 0,
         });
 
-        const [position, setPosition] = useState<PointProps>();
+        const [focus, setFocus] = useState(false);
 
-        const { boxes } = useDragContext();
-
-        const timer = useRef<number>();
-
-        const styleEl = useRef<HTMLStyleElement>();
         /* <------------------------------------ **** STATE END **** ------------------------------------ */
         /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
         /************* This section will include this component parameter *************/
 
-        useEffect(() => {
-            return () => {
-                timer.current && window.clearTimeout(timer.current);
-                if (styleEl.current) {
-                    styleEl.current.remove();
-                    styleEl.current = undefined;
-                }
-            };
-        }, []);
-
         /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
         /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
         /************* This section will include this component general function *************/
-        /**
-         * 匹配当前处在哪个盒子上
-         */
-        const matchBox = (
-            clientX: number,
-            clientY: number,
-            callback: (res: BoxItem | null) => void,
-        ) => {
-            timer.current && window.clearTimeout(timer.current);
-
-            timer.current = window.setTimeout(() => {
-                const els = document.elementsFromPoint(clientX, clientY);
-
-                let data: BoxItem | null = null;
-                for (let j = 0; j < boxes.length; ) {
-                    const item = boxes[j];
-
-                    for (let i = 0; i < els.length; ) {
-                        if (["HTML", "BODY"].includes(els[i].tagName)) {
-                            ++i;
-                        } else if (els[i] === item.el) {
-                            data = {
-                                el: item.el,
-                                id: item.id,
-                            };
-                            i = els.length;
-                        } else {
-                            ++i;
-                        }
-                    }
-                    if (data) {
-                        j = boxes.length;
-                    } else {
-                        ++j;
-                    }
-                }
-                callback(data);
-            });
-        };
 
         /**
          * 移动的通用事件
@@ -140,26 +80,15 @@ export const Drag = forwardRef<HTMLDivElement, DragProps>(
         const handleMove = (x: number, y: number, clientX: number, clientY: number) => {
             point.current.x = x - point.current.offsetX;
             point.current.y = y - point.current.offsetY;
-            matchBox(
-                clientX - point.current.offsetX + point.current.width / 2,
-                clientY - point.current.offsetY + point.current.height / 2,
-                (res) => {
-                    handleDragMove?.({
-                        x,
-                        y,
-                        clientX,
-                        clientY,
-                        width: point.current.width,
-                        height: point.current.height,
-                        name: res?.id,
-                        offsetX: point.current.offsetX,
-                        offsetY: point.current.offsetY,
-                    });
-                },
-            );
-
-            setPosition({
-                ...point.current,
+            handleDragMove?.({
+                x,
+                y,
+                clientX,
+                clientY,
+                width: point.current.width,
+                height: point.current.height,
+                offsetX: point.current.offsetX,
+                offsetY: point.current.offsetY,
             });
         };
 
@@ -172,11 +101,6 @@ export const Drag = forwardRef<HTMLDivElement, DragProps>(
 
         // 当鼠标 或者手 弹起时的通用事件
         const handleUp = (x: number, y: number, clientX: number, clientY: number) => {
-            if (styleEl.current) {
-                styleEl.current.remove();
-                styleEl.current = undefined;
-            }
-            timer.current && window.clearTimeout(timer.current);
             handleDragEnd?.({
                 x,
                 y,
@@ -197,7 +121,6 @@ export const Drag = forwardRef<HTMLDivElement, DragProps>(
                 width: 0,
                 height: 0,
             };
-            setPosition(undefined);
             selectedFn.current = null;
         };
 
@@ -215,11 +138,6 @@ export const Drag = forwardRef<HTMLDivElement, DragProps>(
         const handleDown = (
             e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>,
         ) => {
-            if (styleEl.current) {
-                styleEl.current.remove();
-                styleEl.current = undefined;
-            }
-
             stopSelect(e, selectedFn, true);
 
             const scrollData = getScrollValue();
@@ -229,19 +147,6 @@ export const Drag = forwardRef<HTMLDivElement, DragProps>(
 
             let x = 0;
             let y = 0;
-
-            const el = e.currentTarget;
-            const cursorAttr = window.getComputedStyle(el, null).cursor;
-
-            if (cursorAttr) {
-                styleEl.current = document.createElement("style");
-                styleEl.current.innerHTML = `
-                *{
-                    cursor:${cursorAttr} !important;
-                }
-                `;
-                document.head.append(styleEl.current);
-            }
 
             if ("pageX" in e) {
                 x = e.pageX;
@@ -281,9 +186,6 @@ export const Drag = forwardRef<HTMLDivElement, DragProps>(
                 width: rect.width,
                 height: rect.height,
             };
-            setPosition({
-                ...point.current,
-            });
         };
 
         /**
@@ -344,43 +246,30 @@ export const Drag = forwardRef<HTMLDivElement, DragProps>(
         const classList: string[] = [];
         className && classList.push(className);
 
-        if (position && activeClassName) {
+        if (focus && activeClassName) {
             classList.push(activeClassName);
         }
         return (
-            <>
-                <div
-                    {...props}
-                    ref={ref}
-                    onMouseDown={handleMouseDown}
-                    onTouchStart={handleTouchStart}
-                    onTouchMove={handleTouchMove}
-                    onTouchEnd={handleTouchEnd}
-                    className={classList.join(" ")}
-                >
-                    {children}
-                </div>
-                {!!position &&
-                    createPortal(
-                        <div
-                            className={
-                                "dragPortalContainer" +
-                                (portalClassName ? ` ${portalClassName}` : "")
-                            }
-                            style={{
-                                ...portalStyle,
-                                left: `${position.x}px`,
-                                top: `${position.y}px`,
-                                width: `${position.width}px`,
-                                height: `${position.height}px`,
-                            }}
-                            dangerouslySetInnerHTML={props.dangerouslySetInnerHTML}
-                        >
-                            {children}
-                        </div>,
-                        document.querySelector("body>div") ?? document.body,
-                    )}
-            </>
+            <div
+                {...props}
+                ref={ref}
+                onMouseDown={handleMouseDown}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                tabIndex={-1}
+                onFocus={(e) => {
+                    setFocus(true);
+                    onFocus?.(e);
+                }}
+                onBlur={(e) => {
+                    setFocus(false);
+                    onBlur?.(e);
+                }}
+                className={classList.join(" ")}
+            >
+                {children}
+            </div>
         );
     },
 );

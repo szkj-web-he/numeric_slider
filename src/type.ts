@@ -40,3 +40,29 @@ export interface PublicTempProps {
      */
     handleDragEnd: () => void;
 }
+
+/**
+ * 刻度属性
+ */
+export interface ScaleAttrProps {
+    //每个刻度之间的像素距离
+    margin: number;
+    //每个刻度之间相差的分数
+    value: number;
+    //一分 需要多少像素
+    v: number;
+}
+
+export interface ScoreOption extends OptionProps {
+    score: number;
+}
+
+/**
+ * 每个分数所对应的像素范围
+ */
+export interface ScoreRange {
+    value: number;
+    min: number;
+    max: number;
+    x: number;
+}

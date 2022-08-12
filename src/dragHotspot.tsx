@@ -6,85 +6,104 @@
  */
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import React, { useId, useRef, useState } from "react";
-import { DragBox } from "./DragBox";
+import React, { useEffect, useRef, useState } from "react";
 import RatedOption from "./ratedOption";
-import { OptionProps } from "./type";
+import { ScoreOption, ScoreRange } from "./type";
+import { transformScoreOptions } from "./unit";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
 interface TempProps {
-    active: boolean;
+    scoreOptions: ScoreOption[];
 
-    clientX?: number;
-
-    option?: OptionProps;
-
-    currentId?: string;
+    scoreRange: ScoreRange[];
 }
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
-const Temp: React.FC<TempProps> = ({ active, clientX, option, currentId }) => {
+const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange }) => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
-    const id = useId();
-
     const ref = useRef<HTMLDivElement | null>(null);
+
+    const [height, setHeight] = useState<number>();
+
+    const [scoreDrag, setScoreDrag] = useState(transformScoreOptions(scoreOptions));
 
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
+    useEffect(() => {
+        setScoreDrag([...transformScoreOptions(scoreOptions)]);
+    }, [scoreOptions]);
 
-    console.log(active, "active");
-    console.log(clientX, "clientX");
-    console.log(option, "option");
+    useEffect(() => {
+        const node = ref.current;
+        if (!node) {
+            return;
+        }
+        let timer: null | number = null;
 
-    // useEffect(() => {
-    //     const node = ref.current;
-    //     if (!node) {
-    //         return;
-    //     }
+        const fn = () => {
+            const els = document.querySelectorAll(".ratedOption_items");
+            let max = 0;
+            for (let i = 0; i < els.length; i++) {
+                const el = els[i];
+                if (el instanceof HTMLElement) {
+                    max = Math.max(el.offsetHeight, max);
+                }
+            }
+            setHeight(max);
+        };
 
-    //     const width = node.offsetWidth;
+        const main = () => {
+            timer && window.clearTimeout(timer);
+            timer = window.setTimeout(() => {
+                fn();
+                timer = null;
+            }, 100);
+        };
 
-    //     if (active && typeof left === "number" && option) {
-    //         let val = left;
-    //         if (val < 0) {
-    //             val = 0;
-    //         } else if (val > width) {
-    //             val = width;
-    //         }
+        const ob = new MutationObserver(main);
 
-    //         setActiveOption({
-    //             code: option.code,
-    //             content: option.content,
-    //             left: val,
-    //         });
-    //     }
-    // }, [left, active, option]);
+        ob.observe(node, {
+            attributes: true,
+            subtree: true,
+        });
+        return () => {
+            ob.disconnect();
+            timer && window.clearTimeout(timer);
+        };
+    }, []);
 
     /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
     /************* This section will include this component general function *************/
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
-        <DragBox id={id} className={`dragHotspot${active ? ` active` : ""}`}>
-            <div className="sliderTrunk" ref={ref}>
-                <RatedOption
-                    options={[
-                        {
-                            code: "1",
-                            content: "21321321321",
-                        },
-                    ]}
-                    clientX={10}
-                    parent={ref.current}
-                />
-                {!!(active && typeof clientX === "number" && option && currentId === id) && (
-                    <RatedOption options={[option]} clientX={clientX} parent={ref.current} />
-                )}
+        <div
+            className="dragHotspot_wrap"
+            style={
+                height
+                    ? {
+                          height: `${height}px`,
+                      }
+                    : undefined
+            }
+        >
+            <div className={`dragHotspot`}>
+                <div className="sliderTrunk" ref={ref}>
+                    {scoreDrag.map((item, n) => {
+                        return (
+                            <RatedOption
+                                key={`${item.score}${n}`}
+                                range={scoreRange}
+                                options={item.options}
+                            />
+                        );
+                    })}
+                </div>
             </div>
-        </DragBox>
+        </div>
     );
 };
 /* <------------------------------------ **** FUNCTION COMPONENT END **** ------------------------------------ */

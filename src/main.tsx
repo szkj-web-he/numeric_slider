@@ -7,11 +7,9 @@
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
 import React, { useState } from "react";
-import DragHotspot from "./dragHotspot";
 import Options from "./options";
 import Place from "./place";
-import { DragMoveProps, OptionProps } from "./type";
-import { ScaleMargin } from "./useScaleMarginVal";
+import { ScoreOption } from "./type";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -21,15 +19,20 @@ import { ScaleMargin } from "./useScaleMarginVal";
 const Temp: React.FC = () => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
-    const [dragStatus, setDragStatus] = useState(false);
+    // const [dragStatus, setDragStatus] = useState(false);
 
-    const [left, setLeft] = useState<number>();
+    // const [left, setLeft] = useState<number>();
 
-    const [option, setOption] = useState<OptionProps>();
+    // const [option, setOption] = useState<OptionProps>();
 
-    const [id, setId] = useState<string>();
+    // const [id, setId] = useState<string>();
 
-    const [margin, setMargin] = useState(1);
+    // const [scaleProps, setScaleProps] = useState({
+    //     value: 0,
+    //     margin: 0,
+    // });
+
+    const [selectOptions, setSelectOptions] = useState<Array<ScoreOption>>([]);
 
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
@@ -39,49 +42,12 @@ const Temp: React.FC = () => {
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
     /************* This section will include this component general function *************/
 
-    const handleDragStart = (res: OptionProps) => {
-        setDragStatus(true);
-        setLeft(undefined);
-        setOption({ ...res });
-    };
-
-    const handleDragMove = (res: DragMoveProps) => {
-        setId(res.name);
-        if (res.name) {
-            setLeft(res.clientX);
-        } else {
-            setLeft(undefined);
-        }
-    };
-
-    const handleDragEnd = () => {
-        setDragStatus(false);
-    };
-
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
         <div className="main">
-            <Options
-                handleDragStart={handleDragStart}
-                handleDragMove={handleDragMove}
-                handleDragEnd={handleDragEnd}
-            />
+            <Options setList={setSelectOptions} list={selectOptions} />
             <div className="hr" />
-            <ScaleMargin.Provider
-                value={{
-                    value: margin,
-                    setValue: setMargin,
-                }}
-            >
-                <Place>
-                    <DragHotspot
-                        active={dragStatus}
-                        clientX={left}
-                        option={option}
-                        currentId={id}
-                    />
-                </Place>
-            </ScaleMargin.Provider>
+            <Place scoreOptions={selectOptions} />
         </div>
     );
 };
