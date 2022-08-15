@@ -6,10 +6,10 @@
  */
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import React, { useEffect, useRef, useState } from "react";
+import React, { Fragment, useDeferredValue, useEffect, useRef, useState } from "react";
 import RatedOption from "./ratedOption";
-import { ScoreOption, ScoreRange } from "./type";
-import { transformScoreOptions } from "./unit";
+import { OptionProps, ScoreOption, ScoreRange } from "./type";
+import { deepCloneData, transformScoreOptions } from "./unit";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -29,11 +29,14 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange }) => {
 
     const [scoreDrag, setScoreDrag] = useState(transformScoreOptions(scoreOptions));
 
+    const [selectOption, setSelectOption] = useState<OptionProps>();
+
+    const deferredScoreDrag = useDeferredValue(scoreDrag);
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
     useEffect(() => {
-        setScoreDrag([...transformScoreOptions(scoreOptions)]);
+        setScoreDrag((pre) => [...transformScoreOptions(scoreOptions, pre)]);
     }, [scoreOptions]);
 
     useEffect(() => {
@@ -78,6 +81,61 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange }) => {
     /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
     /************* This section will include this component general function *************/
+
+    /**
+     * 更改分数
+     */
+    const handleScoreChange = (value: number, option: OptionProps) => {
+        // flushSync(() => {
+        setScoreDrag((pre) => {
+            let n = -1;
+
+            //这里删除
+            for (let i = 0; i < pre.length; ) {
+                const item = pre[i];
+                for (let j = 0; j < item.options.length; ) {
+                    const data = item.options[j];
+                    if (data.code === option.code) {
+                        n = j;
+                        j = item.options.length;
+                    } else {
+                        ++j;
+                    }
+                }
+
+                if (n >= 0) {
+                    item.options.splice(n, 1);
+                    i = pre.length;
+                } else {
+                    ++i;
+                }
+            }
+
+            n = -1;
+            //这里添加
+            for (let i = 0; i < pre.length; ) {
+                const item = pre[i];
+                if (item.score === value) {
+                    n = i;
+                    i = pre.length;
+                } else {
+                    ++i;
+                }
+            }
+
+            if (n >= 0) {
+                pre[n].options.push(deepCloneData(option));
+            } else {
+                pre.push({
+                    score: value,
+                    options: [deepCloneData(option)],
+                });
+            }
+            return [...pre];
+        });
+        // });
+    };
+
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
         <div
@@ -92,13 +150,20 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange }) => {
         >
             <div className={`dragHotspot`}>
                 <div className="sliderTrunk" ref={ref}>
-                    {scoreDrag.map((item, n) => {
-                        return (
+                    {deferredScoreDrag.map((item, n) => {
+                        return item.options.length ? (
                             <RatedOption
                                 key={`${item.score}${n}`}
                                 range={scoreRange}
                                 options={item.options}
+                                parent={ref.current}
+                                scoreValue={item.score}
+                                selectOption={selectOption}
+                                handleFocusOption={(res) => setSelectOption(res)}
+                                handleScoreChange={handleScoreChange}
                             />
+                        ) : (
+                            <Fragment key={`${item.score}${n}`} />
                         );
                     })}
                 </div>

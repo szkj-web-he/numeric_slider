@@ -65,16 +65,19 @@ const Temp: React.FC<TempProps> = ({ setScaleRange }) => {
         }
         const arr: ScoreRange[] = [];
         let min = -Infinity;
+
+        const start = scaleData?.[0].left ?? 0;
+        const end = scaleData?.[1].left ?? 0;
+        const s = (end - start) / 2;
+
         for (let i = 0; i < scaleData.length; i++) {
             arr.push({
                 value: scaleData[i].value,
                 min,
-                max: scaleData[i + 1] ? scaleData[i + 1].left / 2 : Infinity,
+                max: scaleData[i + 1] ? scaleData[i].left + s : Infinity,
                 x: scaleData[i].left,
             });
-            if (scaleData[i + 1]) {
-                min = scaleData[i + 1].left / 2;
-            }
+            min = scaleData[i].left + s;
         }
         setScaleRange([...arr]);
     }, [scaleData, setScaleRange]);
@@ -142,7 +145,7 @@ const Temp: React.FC<TempProps> = ({ setScaleRange }) => {
                                 }}
                             />
                         );
-                    } else if (item.status === 2) {
+                    } else if (item.status === 2 || item.status === 1.5) {
                         return (
                             <div
                                 className="scaleItem_big"
@@ -152,21 +155,23 @@ const Temp: React.FC<TempProps> = ({ setScaleRange }) => {
                                 }}
                             >
                                 <div className="scaleItem_icon" />
-                                <div
-                                    className="scaleItemValue"
-                                    ref={(el) => {
-                                        if (item.value !== comms.config.totalScore) {
-                                            return;
-                                        }
-                                        if (!el) {
-                                            return;
-                                        }
+                                {item.status === 2 && (
+                                    <div
+                                        className="scaleItemValue"
+                                        ref={(el) => {
+                                            if (item.value !== comms.config.totalScore) {
+                                                return;
+                                            }
+                                            if (!el) {
+                                                return;
+                                            }
 
-                                        matchLastNode(el);
-                                    }}
-                                >
-                                    {item.value}
-                                </div>
+                                            matchLastNode(el);
+                                        }}
+                                    >
+                                        {item.value}
+                                    </div>
+                                )}
                             </div>
                         );
                     }

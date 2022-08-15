@@ -33,7 +33,7 @@ export const getScrollValue = (): {
 export interface ScaleProps {
     value: number;
     left: number;
-    status: 0 | 1 | 2;
+    status: 0 | 1 | 2 | 1.5;
 }
 
 /**
@@ -82,9 +82,18 @@ const normalScale = (
             data.status = 2;
             count = 0;
         }
-        if (data.left + d * incrementVal <= total) {
+
+        const val = data.left + d * incrementVal;
+
+        if (data.status === 2) {
+            if (val > total - 50) {
+                data.status = 1.5;
+            }
+            arr.push(data);
+        } else if (val <= total) {
             arr.push(data);
         }
+
         if (i + incrementVal >= score) {
             arr.push({
                 value: score,
@@ -129,18 +138,39 @@ interface ScoreOptions {
     options: OptionProps[];
 }
 
-export const transformScoreOptions = (res: ScoreOption[]): ScoreOptions[] => {
+export const transformScoreOptions = (res: ScoreOption[], pre?: ScoreOptions[]): ScoreOptions[] => {
     const data: Record<string, OptionProps[]> = {};
 
     for (let i = 0; i < res.length; i++) {
         const item = res[i];
-        if (data[item.score]) {
-            data[item.score].push({
+        let { score } = item;
+        if (pre) {
+            for (let j = 0; j < pre.length; ) {
+                let status = false;
+                for (let k = 0; k < pre[j].options.length; ) {
+                    const option = pre[j].options[k];
+                    if (option.code === item.code) {
+                        status = true;
+                        k = pre[j].options.length;
+                    } else {
+                        ++k;
+                    }
+                }
+                if (status) {
+                    score = pre[j].score;
+                    j = pre.length;
+                } else {
+                    ++j;
+                }
+            }
+        }
+        if (data[score]) {
+            data[score].push({
                 code: item.code,
                 content: item.content,
             });
         } else {
-            data[item.score] = [
+            data[score] = [
                 {
                     code: item.code,
                     content: item.content,

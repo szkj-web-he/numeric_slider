@@ -277,6 +277,7 @@ body {
     top: -29px;
     left: 0;
     position: absolute;
+    pointer-events: none;
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
@@ -291,11 +292,12 @@ body {
 }
 
 .ratedOption_itemsContainer {
-    margin-top: -1.1px;
+    margin-top: -1.5px;
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
     flex-flow: column nowrap;
+    pointer-events: auto;
 }
 
 .ratedOption_item {
@@ -316,6 +318,7 @@ body {
     letter-spacing: 0.2px;
     color: #4d4d4d;
     word-wrap: break-word;
+    outline: none;
     word-break: break-word;
     white-space: pre-wrap;
     cursor: pointer;
