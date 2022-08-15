@@ -2,7 +2,7 @@
     "name": "numeric_slider",
     "version": "1.0.0",
     "description": "",
-    "main": ".eslintrc.js",
+    "main": "./src/index.tsx",
     "scripts": {
         "build": "webpack --mode=production",
         "clean": "rm -rf dist",
