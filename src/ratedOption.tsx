@@ -6,101 +6,76 @@
  */
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import React, { useEffect, useLayoutEffect, useRef, useState, useTransition } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Drag } from "./Drag";
 import Icon from "./icon";
-import { DragMoveProps, DragPramsProps, OptionProps, ScoreRange } from "./type";
+import { DragMoveProps, DragPramsProps, ScoreRange } from "./type";
+import { ScoreOptions } from "./unit";
 import { useHashId } from "./useHashId";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
 interface TempProps {
-    options: Array<OptionProps>;
-
-    range: ScoreRange[];
+    dragOption: ScoreOptions;
 
     parent: HTMLDivElement | null;
 
-    handleScoreChange: (res: number, option: OptionProps) => void;
+    handleScoreChange: (score: number, left: number) => void;
 
     scoreValue: number;
 
-    handleFocusOption: (option?: OptionProps) => void;
+    handleFocused: (res: boolean) => void;
 
-    selectOption?: OptionProps;
+    getEl: (el: HTMLDivElement | null) => void;
+
+    elder: ScoreOptions[];
+
+    sibling: Record<string, HTMLDivElement | null>;
+
+    active: boolean;
+
+    range: ScoreRange[];
 }
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
 const Temp: React.FC<TempProps> = ({
-    options,
-    range,
+    dragOption,
     parent,
     handleScoreChange,
     scoreValue,
-    handleFocusOption,
-    selectOption,
+    handleFocused,
+    elder,
+    getEl,
+    sibling,
+    active,
+    range,
 }) => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
 
     const ref = useRef<HTMLDivElement | null>(null);
 
-    const [left, setLeft] = useState(() => {
-        let leftVal = 0;
-        for (let i = 0; i < range.length; ) {
-            const item = range[i];
-
-            if (item.value === scoreValue) {
-                i = range.length;
-                leftVal = item.x;
-            } else {
-                ++i;
-            }
-        }
-        return leftVal;
-    });
-
     const id = useHashId("scoreOptions_");
 
     const offsetX = useRef(0);
 
-    const activeRef = useRef<HTMLDivElement | null>(null);
+    const [top, setTop] = useState(() => {
+        const sameScore = elder.filter((item) => item.score === dragOption.score);
 
-    const [, transitionFn] = useTransition();
+        let height = 0;
+        const margin = 5;
+        for (let i = 0; i < sameScore.length; i++) {
+            const el = sibling[sameScore[i].code];
+            height += el?.offsetHeight ? el.offsetHeight + margin : 0;
+        }
+        return height;
+    });
 
-    const scoreChangeFn = useRef(handleScoreChange);
-    const rangeRef = useRef(range);
-    const scoreValueRef = useRef(scoreValue);
-    const selectOptionRef = useRef(selectOption);
-    const optionsRef = useRef(options);
-
-    const leftRef = useRef(left);
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
     useLayoutEffect(() => {
-        leftRef.current = left;
-    }, [left]);
-
-    useLayoutEffect(() => {
-        optionsRef.current = options;
-    }, [options]);
-    useLayoutEffect(() => {
-        scoreChangeFn.current = handleScoreChange;
-    }, [handleScoreChange]);
-    useLayoutEffect(() => {
-        rangeRef.current = range;
-    }, [range]);
-    useLayoutEffect(() => {
-        scoreValueRef.current = scoreValue;
-    }, [scoreValue]);
-    useLayoutEffect(() => {
-        selectOptionRef.current = selectOption;
-    }, [selectOption]);
-
-    useLayoutEffect(() => {
         let style: HTMLStyleElement | null = null;
-
         const fn = () => {
             style?.remove();
             node?.classList.remove(id);
@@ -160,221 +135,46 @@ const Temp: React.FC<TempProps> = ({
             style?.remove();
             node?.classList.remove(id);
         };
-    }, [options, id, left]);
+    }, [dragOption, id]);
 
     useLayoutEffect(() => {
-        setLeft(() => {
-            let leftVal = 0;
-            for (let i = 0; i < rangeRef.current.length; ) {
-                const item = rangeRef.current[i];
+        setTop(() => {
+            const sameScore = elder.filter((item) => item.score === dragOption.score);
 
-                if (item.value === scoreValue) {
-                    i = rangeRef.current.length;
-                    leftVal = item.x;
-                } else {
-                    ++i;
-                }
+            let height = 0;
+            const margin = 5;
+            for (let i = 0; i < sameScore.length; i++) {
+                const el = sibling[sameScore[i].code];
+                height += el?.offsetHeight ? el.offsetHeight + margin : 0;
             }
-            return leftVal;
+            return height;
         });
-    }, [scoreValue]);
+    }, [dragOption, elder, sibling]);
 
     useEffect(() => {
-        const fn = () => {
-            transitionFn(() => {
-                let exactMatch = -1;
-                for (let i = 0; i < rangeRef.current.length; ) {
-                    const item = rangeRef.current[i];
-                    if (item.value === scoreValueRef.current) {
-                        i = rangeRef.current.length;
-                        exactMatch = item.x;
-                    } else {
-                        ++i;
-                    }
-                }
-                if (exactMatch >= 0) {
-                    setLeft(exactMatch);
-                    return;
-                }
-
-                let rangeVal = {
-                    score: 0,
-                    left: 0,
-                };
-                for (let i = 0; i < rangeRef.current.length; ) {
-                    const item = rangeRef.current[i];
-                    if (
-                        item.value <= scoreValueRef.current &&
-                        rangeRef.current?.[i + 1].value > scoreValueRef.current
-                    ) {
-                        i = rangeRef.current.length;
-                        rangeVal = {
-                            left: item.x,
-                            score: item.value,
-                        };
-                    } else {
-                        ++i;
-                    }
-                }
-                setLeft(rangeVal.left);
-                for (let i = 0; i < optionsRef.current.length; i++) {
-                    scoreChangeFn.current(rangeVal.score, optionsRef.current[i]);
-                }
-            });
-        };
-
-        window.addEventListener("resize", fn);
-        return () => {
-            window.removeEventListener("resize", fn);
-        };
-    }, []);
-
-    useEffect(() => {
-        const el = activeRef.current;
+        const node = ref.current;
+        if (!node) {
+            return;
+        }
+        const el = node.children[0] instanceof HTMLElement ? node.children[0] : null;
         if (!el) {
             return;
         }
-        if (document.activeElement !== el) {
-            el.focus();
+
+        if (active) {
+            const activeEl = document.activeElement;
+            if (activeEl !== el) {
+                el.focus();
+            }
         }
-    }, [options, left]);
-
-    useEffect(() => {
-        return () => {
-            activeRef.current = null;
-        };
-    }, [options]);
-
-    useLayoutEffect(() => {
-        const keyDownFn = (status: 1 | -1) => {
-            if (!selectOptionRef.current) {
-                return;
-            }
-            let n = -1;
-            for (let i = 0; i < rangeRef.current.length; ) {
-                if (rangeRef.current[i].value === scoreValueRef.current) {
-                    n = i;
-                    i = rangeRef.current.length;
-                } else {
-                    ++i;
-                }
-            }
-            if (rangeRef.current[n + status]) {
-                scoreChangeFn.current(rangeRef.current[n + status].value, selectOptionRef.current);
-            }
-        };
-
-        const mainKeyDownFn = (e: KeyboardEvent) => {
-            const code = e.key;
-            transitionFn(() => {
-                if (!selectOptionRef.current) {
-                    return;
-                }
-                let status = false;
-                for (let i = 0; i < optionsRef.current.length; ) {
-                    const item = optionsRef.current[i];
-                    if (item.code === selectOptionRef.current.code) {
-                        status = true;
-                        i = optionsRef.current.length;
-                    } else {
-                        ++i;
-                    }
-                }
-                if (!status) {
-                    return;
-                }
-
-                if (!["ArrowRight", "ArrowLeft"].includes(code)) {
-                    return;
-                }
-
-                if (code === "ArrowRight") {
-                    keyDownFn(1);
-                } else {
-                    keyDownFn(-1);
-                }
-            });
-        };
-
-        document.addEventListener("keydown", mainKeyDownFn);
-        return () => {
-            document.removeEventListener("keydown", mainKeyDownFn);
-        };
-    }, []);
-
-    useLayoutEffect(() => {
-        const wheelFn = (status: 1 | -1) => {
-            if (!selectOptionRef.current) {
-                return;
-            }
-            let n = -1;
-            for (let i = 0; i < rangeRef.current.length; ) {
-                if (rangeRef.current[i].value === scoreValueRef.current) {
-                    n = i;
-                    i = rangeRef.current.length;
-                } else {
-                    ++i;
-                }
-            }
-            if (rangeRef.current[n + status]) {
-                scoreChangeFn.current(rangeRef.current[n + status].value, selectOptionRef.current);
-            }
-        };
-
-        const mainWheelFn = (e: WheelEvent) => {
-            if (!selectOptionRef.current) {
-                return;
-            }
-
-            let status: 1 | -1 | 0 = 0;
-            if (e.deltaY > 0) {
-                status = 1;
-            } else if (e.deltaY < 0) {
-                status = -1;
-            }
-            if (status === 0) {
-                return;
-            }
-
-            let flag = false;
-            for (let i = 0; i < optionsRef.current.length; ) {
-                const item = optionsRef.current[i];
-                if (item.code === selectOptionRef.current.code) {
-                    flag = true;
-                    i = optionsRef.current.length;
-                } else {
-                    ++i;
-                }
-            }
-            if (!flag) {
-                return;
-            }
-
-            e.preventDefault();
-            /**
-             * 防抖滚动
-             */
-            transitionFn(() => {
-                wheelFn(status as 1 | -1);
-            });
-        };
-
-        const optionAttr = { passive: false };
-        document.addEventListener("wheel", mainWheelFn, optionAttr);
-        return () => {
-            document.removeEventListener("wheel", mainWheelFn, optionAttr);
-        };
-    }, []);
+    }, [active]);
 
     /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
     /************* This section will include this component general function *************/
 
-    const onFocus = (option: OptionProps) => {
-        handleFocusOption(option);
-    };
-    const onBlur = () => {
-        handleFocusOption();
+    const handleDragEnd = () => {
+        offsetX.current = 0;
     };
 
     const handleDragStart = (res: DragPramsProps) => {
@@ -386,7 +186,7 @@ const Temp: React.FC<TempProps> = ({
         offsetX.current = res.clientX - rect.left;
     };
 
-    const handleDragMove = (res: DragMoveProps, option: OptionProps) => {
+    const handleDragMove = (res: DragMoveProps) => {
         if (!parent) {
             return;
         }
@@ -394,68 +194,63 @@ const Temp: React.FC<TempProps> = ({
 
         const left = res.clientX - offsetX.current - rect.left;
         let score = 0;
+        let x = 0;
         for (let i = 0; i < range.length; ) {
             const item = range[i];
 
             if (item.min <= left && item.max > left) {
                 i = range.length;
                 score = item.value;
+                x = item.x;
             } else {
                 ++i;
             }
         }
-        handleScoreChange(score, option);
-    };
-
-    const handleDragEnd = () => {
-        offsetX.current = 0;
+        handleScoreChange(score, x);
     };
 
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
 
     const _style: React.CSSProperties = {
-        transform: `translateX(${left}px)`,
+        transform: `translate(${dragOption.left}px,${top}px)`,
     };
-    if (options.some((item) => item.code === selectOption?.code)) {
+    if (active) {
         _style.zIndex = 99;
     }
     return (
-        <div className="ratedOption_items" style={_style}>
-            <div className="ratedOption_score">{scoreValue}分</div>
-            <Icon className="ratedOption_icon" />
+        <div className="ratedOption_items" style={_style} ref={getEl}>
+            {top === 0 ? (
+                <>
+                    <div className="ratedOption_score">{scoreValue}分</div>
+                    <Icon className="ratedOption_icon" />
+                </>
+            ) : (
+                <></>
+            )}
             <div className="ratedOption_itemsContainer" ref={ref}>
-                {options.map((option) => {
-                    return (
-                        <Drag
-                            key={option.code}
-                            className="ratedOption_item"
-                            activeClassName="active"
-                            handleDragEnd={() => {
-                                handleDragEnd?.();
-                            }}
-                            handleDragStart={(res) => {
-                                handleDragStart?.(res);
-                            }}
-                            handleDragMove={(res) => {
-                                handleDragMove?.(res, option);
-                            }}
-                            onFocus={() => onFocus(option)}
-                            onBlur={onBlur}
-                            ref={(el) => {
-                                if (option.code === selectOption?.code) {
-                                    activeRef.current = el;
-                                }
-                            }}
-                        >
-                            <span
-                                className="ratedOption_container"
-                                dangerouslySetInnerHTML={{
-                                    __html: option.content,
-                                }}
-                            />
-                        </Drag>
-                    );
-                })}
+                <Drag
+                    key={dragOption.code}
+                    className="ratedOption_item"
+                    active={active}
+                    handleDragEnd={() => {
+                        handleDragEnd?.();
+                    }}
+                    handleDragStart={(res) => {
+                        handleDragStart?.(res);
+                    }}
+                    handleDragMove={(res) => {
+                        handleDragMove?.(res);
+                    }}
+                    onFocus={() => handleFocused(true)}
+                    onBlur={() => handleFocused(false)}
+                >
+                    <span
+                        className="ratedOption_container"
+                        dangerouslySetInnerHTML={{
+                            __html: dragOption.content,
+                        }}
+                    />
+                </Drag>
             </div>
         </div>
     );

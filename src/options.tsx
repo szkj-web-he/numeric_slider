@@ -11,15 +11,15 @@ import { comms } from ".";
 import { useMobileStatus } from "./isMobileContext";
 import Option from "./item";
 import { ScrollComponent } from "./Scroll";
-import { OptionProps, ScoreOption } from "./type";
+import { OptionProps } from "./type";
 import { deepCloneData } from "./unit";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
 interface TempProps {
-    setList: (res: ScoreOption[]) => void;
+    setList: (res: OptionProps[]) => void;
 
-    list: ScoreOption[];
+    list: OptionProps[];
 }
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
@@ -50,7 +50,7 @@ const Temp: React.FC<TempProps> = ({ setList, list }) => {
         if (n >= 0) {
             arr.splice(n, 1);
         } else {
-            arr.push({ ...item, score: 0 });
+            arr.push({ ...item });
         }
         setList([...arr]);
     };

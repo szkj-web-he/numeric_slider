@@ -10,12 +10,12 @@ import React, { useState } from "react";
 import { comms } from ".";
 import DragHotspot from "./dragHotspot";
 import Ruler from "./ruler";
-import { ScoreOption, ScoreRange } from "./type";
+import { OptionProps, ScoreRange } from "./type";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
 interface TempProps {
-    scoreOptions: ScoreOption[];
+    scoreOptions: OptionProps[];
 }
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */

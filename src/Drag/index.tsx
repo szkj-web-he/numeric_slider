@@ -6,7 +6,7 @@
  */
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import React, { forwardRef, useRef, useState } from "react";
+import React, { forwardRef, useRef } from "react";
 import { stopSelect } from "../Scroll/Unit/noSelected";
 import { DragMoveProps, DragPramsProps, PointProps } from "../type";
 import { getScrollValue } from "../unit";
@@ -22,7 +22,7 @@ export interface DragProps extends React.HTMLAttributes<HTMLDivElement> {
 
     children?: React.ReactNode;
 
-    activeClassName?: string;
+    active: boolean;
 }
 
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
@@ -38,7 +38,7 @@ export const Drag = forwardRef<HTMLDivElement, DragProps>(
             onTouchStart,
             onTouchMove,
             onTouchEnd,
-            activeClassName,
+            active,
             className,
             onFocus,
             onBlur,
@@ -63,8 +63,6 @@ export const Drag = forwardRef<HTMLDivElement, DragProps>(
             width: 0,
             height: 0,
         });
-
-        const [focus, setFocus] = useState(false);
 
         /* <------------------------------------ **** STATE END **** ------------------------------------ */
         /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
@@ -245,10 +243,7 @@ export const Drag = forwardRef<HTMLDivElement, DragProps>(
         /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
         const classList: string[] = [];
         className && classList.push(className);
-
-        if (focus && activeClassName) {
-            classList.push(activeClassName);
-        }
+        active && classList.push("active");
         return (
             <div
                 {...props}
@@ -259,11 +254,9 @@ export const Drag = forwardRef<HTMLDivElement, DragProps>(
                 onTouchEnd={handleTouchEnd}
                 tabIndex={-1}
                 onFocus={(e) => {
-                    setFocus(true);
                     onFocus?.(e);
                 }}
                 onBlur={(e) => {
-                    setFocus(false);
                     onBlur?.(e);
                 }}
                 className={classList.join(" ")}

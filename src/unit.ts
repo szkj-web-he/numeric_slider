@@ -6,9 +6,12 @@
  */
 
 import { comms } from ".";
-import { OptionProps, ScoreOption } from "./type";
+import { OptionProps } from "./type";
 
 export const deepCloneData = <T>(data: T): T => {
+    if (data == null) {
+        return data;
+    }
     return JSON.parse(JSON.stringify(data)) as T;
 };
 
@@ -133,57 +136,34 @@ export const setScale = ():
  *
  */
 
-interface ScoreOptions {
+export interface ScoreOptions extends OptionProps {
     score: number;
-    options: OptionProps[];
+    left: number;
 }
 
-export const transformScoreOptions = (res: ScoreOption[], pre?: ScoreOptions[]): ScoreOptions[] => {
-    const data: Record<string, OptionProps[]> = {};
-
+export const transformScoreOptions = (res: OptionProps[], pre?: ScoreOptions[]): ScoreOptions[] => {
+    const arr: ScoreOptions[] = [];
     for (let i = 0; i < res.length; i++) {
-        const item = res[i];
-        let { score } = item;
+        let score = 0;
+        let left = 0;
         if (pre) {
             for (let j = 0; j < pre.length; ) {
-                let status = false;
-                for (let k = 0; k < pre[j].options.length; ) {
-                    const option = pre[j].options[k];
-                    if (option.code === item.code) {
-                        status = true;
-                        k = pre[j].options.length;
-                    } else {
-                        ++k;
-                    }
-                }
-                if (status) {
-                    score = pre[j].score;
+                const option = pre[j];
+                if (option.code === res[i].code) {
+                    score = option.score;
+                    left = option.left;
                     j = pre.length;
                 } else {
                     ++j;
                 }
             }
         }
-        if (data[score]) {
-            data[score].push({
-                code: item.code,
-                content: item.content,
-            });
-        } else {
-            data[score] = [
-                {
-                    code: item.code,
-                    content: item.content,
-                },
-            ];
-        }
-    }
 
-    const arr: Array<{ score: number; options: OptionProps[] }> = [];
-    for (const key in data) {
         arr.push({
-            score: Number(key),
-            options: data[key],
+            code: res[i].code,
+            content: res[i].content,
+            left,
+            score,
         });
     }
     return arr;

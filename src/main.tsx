@@ -9,7 +9,7 @@
 import React, { useState } from "react";
 import Options from "./options";
 import Place from "./place";
-import { ScoreOption } from "./type";
+import { OptionProps } from "./type";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -19,20 +19,7 @@ import { ScoreOption } from "./type";
 const Temp: React.FC = () => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
-    // const [dragStatus, setDragStatus] = useState(false);
-
-    // const [left, setLeft] = useState<number>();
-
-    // const [option, setOption] = useState<OptionProps>();
-
-    // const [id, setId] = useState<string>();
-
-    // const [scaleProps, setScaleProps] = useState({
-    //     value: 0,
-    //     margin: 0,
-    // });
-
-    const [selectOptions, setSelectOptions] = useState<Array<ScoreOption>>([]);
+    const [selectOptions, setSelectOptions] = useState<Array<OptionProps>>([]);
 
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
