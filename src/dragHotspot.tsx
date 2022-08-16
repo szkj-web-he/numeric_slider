@@ -14,6 +14,7 @@ import React, {
     useState,
     useTransition,
 } from "react";
+import { flushSync } from "react-dom";
 import RatedOption from "./ratedOption";
 import { OptionProps, ScoreRange } from "./type";
 import { deepCloneData, ScoreOptions, transformScoreOptions } from "./unit";
@@ -85,7 +86,13 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange }) => {
             for (let i = 0; i < els.length; i++) {
                 const el = els[i];
                 if (el instanceof HTMLElement) {
-                    max = Math.max(el.offsetHeight, max);
+                    const transformArr = window
+                        .getComputedStyle(el, null)
+                        .transform.replace(/(matrix\(|\))/g, "")
+                        .split(",");
+
+                    const translateY = Number(transformArr[transformArr.length - 1]);
+                    max = Math.max(el.offsetHeight + translateY, max);
                 }
             }
             setHeight(max);
@@ -270,6 +277,50 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange }) => {
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
     /************* This section will include this component general function *************/
 
+    const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!selectOption) {
+            return;
+        }
+
+        const el = e.currentTarget;
+        const { left } = el.getBoundingClientRect();
+        const { clientX } = e;
+        transitionFn(() => {
+            const x = clientX - left;
+
+            let spot = {
+                x: 0,
+                score: 0,
+            };
+            for (let i = 0; i < scoreRange.length; ) {
+                const item = scoreRange[i];
+                if (item.min <= x && item.max > x) {
+                    i = scoreRange.length;
+                    spot = {
+                        x: item.x,
+                        score: item.value,
+                    };
+                } else {
+                    ++i;
+                }
+            }
+
+            setScoreDrag((pre) => {
+                for (let i = 0; i < pre.length; ) {
+                    if (pre[i].code === selectOption.code) {
+                        pre[i].left = spot.x;
+                        pre[i].score = spot.score;
+
+                        i = pre.length;
+                    } else {
+                        ++i;
+                    }
+                }
+                return deepCloneData(pre);
+            });
+        });
+    };
+
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
         <div
@@ -283,32 +334,39 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange }) => {
             }
         >
             <div className={`dragHotspot`}>
-                <div className="sliderTrunk" ref={ref}>
-                    {deferredScoreDrag.map((item, n) => {
-                        return (
-                            <RatedOption
-                                key={`${item.code}`}
-                                dragOption={item}
-                                parent={ref.current}
-                                scoreValue={item.score}
-                                getEl={(el) => {
-                                    dragEl.current[item.code] = el;
-                                }}
-                                sibling={dragEl.current}
-                                elder={deepCloneData(deferredScoreDrag).slice(0, n)}
-                                handleFocused={(res) => {
-                                    if (res) {
-                                        setSelectOption({
-                                            code: item.code,
-                                            content: item.content,
-                                        });
-                                    } else {
-                                        setSelectOption(undefined);
-                                    }
-                                }}
-                                active={item.code === selectOption?.code}
-                                range={scoreRange}
-                                handleScoreChange={(score, left) => {
+                <div
+                    className="sliderTrunk"
+                    ref={ref}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={handleClick}
+                />
+
+                {deferredScoreDrag.map((item, n) => {
+                    return (
+                        <RatedOption
+                            key={`${item.code}`}
+                            dragOption={item}
+                            parent={ref.current}
+                            scoreValue={item.score}
+                            getEl={(el) => {
+                                dragEl.current[item.code] = el;
+                            }}
+                            sibling={dragEl.current}
+                            elder={deepCloneData(deferredScoreDrag).slice(0, n)}
+                            handleFocused={(res) => {
+                                if (res) {
+                                    setSelectOption({
+                                        code: item.code,
+                                        content: item.content,
+                                    });
+                                } else {
+                                    setSelectOption(undefined);
+                                }
+                            }}
+                            active={item.code === selectOption?.code}
+                            range={scoreRange}
+                            handleScoreChange={(score, left) => {
+                                flushSync(() => {
                                     setScoreDrag((pre) => {
                                         let n = -1;
                                         for (let i = 0; i < scoreDrag.length; ) {
@@ -324,11 +382,11 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange }) => {
                                         pre[n].left = left;
                                         return deepCloneData(pre);
                                     });
-                                }}
-                            />
-                        );
-                    })}
-                </div>
+                                });
+                            }}
+                        />
+                    );
+                })}
             </div>
         </div>
     );

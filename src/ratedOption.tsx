@@ -6,11 +6,11 @@
  */
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState, useTransition } from "react";
 import { Drag } from "./Drag";
 import Icon from "./icon";
 import { DragMoveProps, DragPramsProps, ScoreRange } from "./type";
-import { ScoreOptions } from "./unit";
+import { deepCloneData, ScoreOptions } from "./unit";
 import { useHashId } from "./useHashId";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
@@ -71,11 +71,103 @@ const Temp: React.FC<TempProps> = ({
         return height;
     });
 
+    const dragOptionRef = useRef<string>();
+
+    const count = useRef(0);
+
+    const [cloneDragOption, setCloneDragOption] = useState(dragOption);
+
+    const styleRef = useRef<HTMLStyleElement>();
+
+    const [, transitionFn] = useTransition();
+
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
     useLayoutEffect(() => {
+        setCloneDragOption((pre) => {
+            if (dragOptionRef.current === JSON.stringify(dragOption)) {
+                return pre;
+            } else {
+                dragOptionRef.current = JSON.stringify(dragOption);
+                return deepCloneData(dragOption);
+            }
+        });
+    }, [dragOption]);
+
+    useLayoutEffect(() => {
+        const fn = () => {
+            styleRef.current?.remove();
+            node?.classList.remove(id);
+
+            const body = ref.current;
+            if (!body) {
+                return;
+            }
+
+            let el: HTMLElement | null = null;
+            for (let i = 0; i < body.children.length; ) {
+                const item = body.children[i];
+                if (item instanceof HTMLElement) {
+                    el = item;
+                    i = body.children.length;
+                } else {
+                    ++i;
+                }
+            }
+
+            const parent = body.parentElement;
+            if (!el) {
+                return;
+            }
+            if (!parent) {
+                return;
+            }
+
+            const rect = el.getBoundingClientRect();
+
+            let val = rect.left - rect.width / 2;
+
+            if (rect.left - rect.width / 2 < 5) {
+                val = 5;
+            } else if (rect.left + rect.width > document.body.offsetWidth - 5) {
+                val = document.body.offsetWidth - 5 - rect.width;
+            }
+
+            const pLeft = parent.getBoundingClientRect().left;
+
+            const x = val - pLeft;
+
+            styleRef.current = document.createElement("style");
+            styleRef.current.innerHTML = `.${id}{
+            transform:translateX(${x}px)
+          }`;
+            body.classList.add(id);
+            document.body.append(styleRef.current);
+        };
+        const node = ref.current;
+        let timer: null | number = null;
+
+        if (count.current) {
+            timer && window.clearTimeout(timer);
+            timer = window.setTimeout(() => {
+                transitionFn(fn);
+            }, 110);
+        } else {
+            fn();
+        }
+
+        if (cloneDragOption.left === 0) {
+            ++count.current;
+        }
+        return () => {
+            timer && window.clearTimeout(timer);
+        };
+    }, [cloneDragOption, id, top]);
+
+    useEffect(() => {
         let style: HTMLStyleElement | null = null;
+        const node = ref.current;
         const fn = () => {
             style?.remove();
             node?.classList.remove(id);
@@ -125,29 +217,33 @@ const Temp: React.FC<TempProps> = ({
             body.classList.add(id);
             document.body.append(style);
         };
-
-        fn();
-        window.addEventListener("resize", fn);
-
-        const node = ref.current;
+        let timer: null | number = null;
+        const main = () => {
+            timer && window.clearTimeout(timer);
+            timer = window.setTimeout(fn, 100);
+        };
+        window.addEventListener("resize", main);
         return () => {
-            window.removeEventListener("resize", fn);
+            window.removeEventListener("resize", main);
             style?.remove();
+            timer && window.clearTimeout(timer);
             node?.classList.remove(id);
         };
-    }, [dragOption, id]);
+    }, [id]);
 
-    useLayoutEffect(() => {
-        setTop(() => {
-            const sameScore = elder.filter((item) => item.score === dragOption.score);
+    useEffect(() => {
+        transitionFn(() => {
+            setTop(() => {
+                const sameScore = elder.filter((item) => item.score === dragOption.score);
 
-            let height = 0;
-            const margin = 5;
-            for (let i = 0; i < sameScore.length; i++) {
-                const el = sibling[sameScore[i].code];
-                height += el?.offsetHeight ? el.offsetHeight + margin : 0;
-            }
-            return height;
+                let height = 0;
+                const margin = 5;
+                for (let i = 0; i < sameScore.length; i++) {
+                    const el = sibling[sameScore[i].code];
+                    height += el?.offsetHeight ? el.offsetHeight + margin : 0;
+                }
+                return height;
+            });
         });
     }, [dragOption, elder, sibling]);
 
@@ -182,6 +278,7 @@ const Temp: React.FC<TempProps> = ({
         if (!el) {
             return;
         }
+        handleFocused(true);
         const rect = el.getBoundingClientRect();
         offsetX.current = res.clientX - rect.left;
     };
@@ -191,7 +288,6 @@ const Temp: React.FC<TempProps> = ({
             return;
         }
         const rect = parent.getBoundingClientRect();
-
         const left = res.clientX - offsetX.current - rect.left;
         let score = 0;
         let x = 0;
