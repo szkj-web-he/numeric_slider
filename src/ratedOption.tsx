@@ -260,10 +260,18 @@ const Temp: React.FC<TempProps> = ({
         if (active) {
             const activeEl = document.activeElement;
             if (activeEl !== el) {
-                el.focus();
+                el.focus({
+                    preventScroll: true,
+                });
             }
         }
     }, [active]);
+
+    useEffect(() => {
+        return () => {
+            styleRef.current?.remove();
+        };
+    }, []);
 
     /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */

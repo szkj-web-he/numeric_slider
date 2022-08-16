@@ -25,10 +25,15 @@ interface TempProps {
     scoreOptions: OptionProps[];
 
     scoreRange: ScoreRange[];
+
+    /**
+     *当分数发生变化的时候
+     */
+    onChange: (res: ScoreOptions[]) => void;
 }
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
-const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange }) => {
+const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange, onChange }) => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
     const ref = useRef<HTMLDivElement | null>(null);
@@ -52,9 +57,14 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange }) => {
     const [, transitionFn] = useTransition();
 
     const scoreDragRef = useRef(deepCloneData(scoreDrag));
+
+    const changeFn = useRef(onChange);
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
+    useLayoutEffect(() => {
+        changeFn.current = onChange;
+    }, [onChange]);
 
     useLayoutEffect(() => {
         selectOptionRef.current = deepCloneData(selectOption);
@@ -62,6 +72,9 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange }) => {
 
     useLayoutEffect(() => {
         scoreDragRef.current = deepCloneData(scoreDrag);
+        transitionFn(() => {
+            changeFn.current(scoreDragRef.current);
+        });
     }, [scoreDrag]);
 
     useLayoutEffect(() => {

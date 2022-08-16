@@ -37,7 +37,29 @@ const Temp: React.FC<TempProps> = ({ scoreOptions }) => {
         <div className="place">
             <div className="placeTips">{comms.config.optionsInstruction}</div>
             <Ruler setScaleRange={setScoreRange} />
-            <DragHotspot scoreRange={scoreRange} scoreOptions={scoreOptions} />
+            <DragHotspot
+                scoreRange={scoreRange}
+                scoreOptions={scoreOptions}
+                onChange={(res) => {
+                    const data: Record<string, number> = {};
+                    const arr = comms.config.options ?? [];
+                    for (let i = 0; i < arr.length; i++) {
+                        let score = 0;
+                        for (let j = 0; j < res.length; ) {
+                            const item = res[j];
+                            if (item.code === arr[i].code) {
+                                score = item.score;
+                                j = res.length;
+                            } else {
+                                ++j;
+                            }
+                        }
+                        data[arr[i].code] = score;
+                    }
+                    console.log(JSON.stringify(data));
+                    comms.state = data;
+                }}
+            />
         </div>
     );
 };

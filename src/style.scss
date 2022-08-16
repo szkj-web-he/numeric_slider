@@ -240,7 +240,6 @@ body {
 }
 
 .dragHotspot {
-    margin-top: 22px;
     border-radius: 10px;
     width: calc(100% - 32px);
     position: relative;
@@ -332,4 +331,9 @@ body {
     height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
+}
+
+.dragHotspot_wrap {
+    margin-top: 35px;
+    min-height: 70px;
 }
