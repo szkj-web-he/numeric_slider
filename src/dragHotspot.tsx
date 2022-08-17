@@ -182,7 +182,7 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange, onChange }) => {
             if (!["ArrowRight", "ArrowLeft"].includes(code)) {
                 return;
             }
-
+            e.preventDefault();
             if (code === "ArrowRight") {
                 fn(1);
             } else {

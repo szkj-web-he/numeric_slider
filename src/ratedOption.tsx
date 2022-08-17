@@ -232,7 +232,7 @@ const Temp: React.FC<TempProps> = ({
         if (!el) {
             return;
         }
-        console.log(el, active);
+
         if (active) {
             const activeEl = document.activeElement;
             if (activeEl !== el) {
@@ -325,7 +325,6 @@ const Temp: React.FC<TempProps> = ({
                         handleFocused(true);
                     }}
                     onBlur={() => {
-                        console.log("onBlur");
                         handleFocused(false);
                     }}
                 >

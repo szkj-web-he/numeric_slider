@@ -2,7 +2,6 @@ import { useMemo } from "react";
 
 export const useHashId = (prefix?: string): string => {
     return useMemo(() => {
-        console.log(111, prefix);
         const l = 10;
         const psList = window.crypto.getRandomValues(new Uint32Array(l));
         let val = "";
