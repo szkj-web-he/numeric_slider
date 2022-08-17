@@ -11,6 +11,7 @@ import { comms } from ".";
 import { useMobileStatus } from "./isMobileContext";
 import { ScrollComponent } from "./Scroll";
 import { OptionProps } from "./type";
+import { deepCloneData } from "./unit";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -34,7 +35,23 @@ const Temp: React.FC<TempProps> = ({ setList, list }) => {
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
     /************* This section will include this component general function *************/
     const handleClick = (item: OptionProps) => {
-        setList([{ ...item }]);
+        let n = -1;
+        for (let i = 0; i < list.length; ) {
+            if (list[i].code === item.code) {
+                n = i;
+                i = list.length;
+            } else {
+                ++i;
+            }
+        }
+        const arr = deepCloneData(list);
+
+        if (n >= 0) {
+            arr.splice(n, 1);
+        } else {
+            arr.push({ ...item });
+        }
+        setList([...arr]);
     };
 
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
