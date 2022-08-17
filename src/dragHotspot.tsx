@@ -6,14 +6,7 @@
  */
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import React, {
-    useDeferredValue,
-    useEffect,
-    useLayoutEffect,
-    useRef,
-    useState,
-    useTransition,
-} from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import RatedOption from "./ratedOption";
 import { OptionProps, ScoreRange } from "./type";
@@ -46,15 +39,11 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange, onChange }) => {
         scoreOptions[scoreOptions.length - 1],
     );
 
-    const deferredScoreDrag = useDeferredValue(scoreDrag);
-
     const dragEl = useRef<Record<string, HTMLDivElement | null>>({});
 
     const selectOptionRef = useRef(deepCloneData(selectOption));
 
     const rangeRef = useRef(deepCloneData(scoreRange));
-
-    const [, transitionFn] = useTransition();
 
     const scoreDragRef = useRef(deepCloneData(scoreDrag));
 
@@ -72,9 +61,13 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange, onChange }) => {
 
     useLayoutEffect(() => {
         scoreDragRef.current = deepCloneData(scoreDrag);
-        transitionFn(() => {
+
+        const timer = window.setTimeout(() => {
             changeFn.current(scoreDragRef.current);
         });
+        return () => {
+            window.clearTimeout(timer);
+        };
     }, [scoreDrag]);
 
     useLayoutEffect(() => {
@@ -182,21 +175,19 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange, onChange }) => {
 
         const mainKeyDownFn = (e: KeyboardEvent) => {
             const code = e.key;
-            transitionFn(() => {
-                if (!selectOptionRef.current) {
-                    return;
-                }
+            if (!selectOptionRef.current) {
+                return;
+            }
 
-                if (!["ArrowRight", "ArrowLeft"].includes(code)) {
-                    return;
-                }
+            if (!["ArrowRight", "ArrowLeft"].includes(code)) {
+                return;
+            }
 
-                if (code === "ArrowRight") {
-                    fn(1);
-                } else {
-                    fn(-1);
-                }
-            });
+            if (code === "ArrowRight") {
+                fn(1);
+            } else {
+                fn(-1);
+            }
         };
 
         const mainWheelFn = (e: WheelEvent) => {
@@ -214,9 +205,7 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange, onChange }) => {
             }
 
             e.preventDefault();
-            transitionFn(() => {
-                fn(status as 1 | -1);
-            });
+            fn(status);
         };
 
         document.addEventListener("keydown", mainKeyDownFn);
@@ -298,39 +287,37 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange, onChange }) => {
         const el = e.currentTarget;
         const { left } = el.getBoundingClientRect();
         const { clientX } = e;
-        transitionFn(() => {
-            const x = clientX - left;
+        const x = clientX - left;
 
-            let spot = {
-                x: 0,
-                score: 0,
-            };
-            for (let i = 0; i < scoreRange.length; ) {
-                const item = scoreRange[i];
-                if (item.min <= x && item.max > x) {
-                    i = scoreRange.length;
-                    spot = {
-                        x: item.x,
-                        score: item.value,
-                    };
+        let spot = {
+            x: 0,
+            score: 0,
+        };
+        for (let i = 0; i < scoreRange.length; ) {
+            const item = scoreRange[i];
+            if (item.min <= x && item.max > x) {
+                i = scoreRange.length;
+                spot = {
+                    x: item.x,
+                    score: item.value,
+                };
+            } else {
+                ++i;
+            }
+        }
+
+        setScoreDrag((pre) => {
+            for (let i = 0; i < pre.length; ) {
+                if (pre[i].code === selectOption.code) {
+                    pre[i].left = spot.x;
+                    pre[i].score = spot.score;
+
+                    i = pre.length;
                 } else {
                     ++i;
                 }
             }
-
-            setScoreDrag((pre) => {
-                for (let i = 0; i < pre.length; ) {
-                    if (pre[i].code === selectOption.code) {
-                        pre[i].left = spot.x;
-                        pre[i].score = spot.score;
-
-                        i = pre.length;
-                    } else {
-                        ++i;
-                    }
-                }
-                return deepCloneData(pre);
-            });
+            return deepCloneData(pre);
         });
     };
 
@@ -354,7 +341,7 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange, onChange }) => {
                     onClick={handleClick}
                 />
 
-                {deferredScoreDrag.map((item, n) => {
+                {scoreDrag.map((item, n) => {
                     return (
                         <RatedOption
                             key={`${item.code}`}
@@ -365,7 +352,7 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange, onChange }) => {
                                 dragEl.current[item.code] = el;
                             }}
                             sibling={dragEl.current}
-                            elder={deepCloneData(deferredScoreDrag).slice(0, n)}
+                            elder={deepCloneData(scoreDrag).slice(0, n)}
                             handleFocused={(res) => {
                                 if (res) {
                                     setSelectOption({

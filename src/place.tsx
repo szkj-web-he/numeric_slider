@@ -42,21 +42,9 @@ const Temp: React.FC<TempProps> = ({ scoreOptions }) => {
                 scoreOptions={scoreOptions}
                 onChange={(res) => {
                     const data: Record<string, number> = {};
-                    const arr = comms.config.options ?? [];
-                    for (let i = 0; i < arr.length; i++) {
-                        let score = 0;
-                        for (let j = 0; j < res.length; ) {
-                            const item = res[j];
-                            if (item.code === arr[i].code) {
-                                score = item.score;
-                                j = res.length;
-                            } else {
-                                ++j;
-                            }
-                        }
-                        data[arr[i].code] = score;
+                    for (let i = 0; i < res.length; i++) {
+                        data[res[i].code] = res[i].score;
                     }
-                    console.log(JSON.stringify(data));
                     comms.state = data;
                 }}
             />

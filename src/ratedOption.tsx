@@ -6,7 +6,7 @@
  */
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import React, { useEffect, useLayoutEffect, useRef, useState, useTransition } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Drag } from "./Drag";
 import Icon from "./icon";
 import { DragMoveProps, DragPramsProps, ScoreRange } from "./type";
@@ -73,13 +73,9 @@ const Temp: React.FC<TempProps> = ({
 
     const dragOptionRef = useRef<string>();
 
-    const count = useRef(0);
-
     const [cloneDragOption, setCloneDragOption] = useState(dragOption);
 
     const styleRef = useRef<HTMLStyleElement>();
-
-    const [, transitionFn] = useTransition();
 
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
@@ -95,73 +91,55 @@ const Temp: React.FC<TempProps> = ({
         });
     }, [dragOption]);
 
-    useLayoutEffect(() => {
+    useEffect(() => {
+        const node = ref.current;
         const fn = () => {
             styleRef.current?.remove();
             node?.classList.remove(id);
 
-            const body = ref.current;
-            if (!body) {
+            if (!node) {
                 return;
             }
 
-            let el: HTMLElement | null = null;
-            for (let i = 0; i < body.children.length; ) {
-                const item = body.children[i];
+            let children: HTMLElement | null = null;
+            for (let i = 0; i < node.children.length; ) {
+                const item = node.children[i];
                 if (item instanceof HTMLElement) {
-                    el = item;
-                    i = body.children.length;
+                    children = item;
+                    i = node.children.length;
                 } else {
                     ++i;
                 }
             }
 
-            const parent = body.parentElement;
-            if (!el) {
+            if (!children) {
                 return;
             }
-            if (!parent) {
-                return;
+            {
+                document.body.offsetWidth;
             }
-
-            const rect = el.getBoundingClientRect();
-
-            let val = rect.left - rect.width / 2;
-
-            if (rect.left - rect.width / 2 < 5) {
-                val = 5;
+            const rect = children.getBoundingClientRect();
+            let val = 0;
+            if (rect.left < 5) {
+                val = 5 - rect.left;
             } else if (rect.left + rect.width > document.body.offsetWidth - 5) {
-                val = document.body.offsetWidth - 5 - rect.width;
+                val = document.body.offsetWidth - 5 - rect.width - rect.left;
             }
 
-            const pLeft = parent.getBoundingClientRect().left;
-
-            const x = val - pLeft;
-
+            if (val === 0) {
+                return;
+            }
             styleRef.current = document.createElement("style");
             styleRef.current.innerHTML = `.${id}{
-            transform:translateX(${x}px)
+            transform:translateX(${val}px)
           }`;
-            body.classList.add(id);
+            node.classList.add(id);
             document.body.append(styleRef.current);
         };
-        const node = ref.current;
-        let timer: null | number = null;
-
-        if (count.current) {
-            timer && window.clearTimeout(timer);
-            timer = window.setTimeout(() => {
-                transitionFn(fn);
-            }, 110);
-        } else {
-            fn();
-        }
-
-        if (cloneDragOption.left === 0) {
-            ++count.current;
-        }
+        fn();
+        const timer = window.setTimeout(fn, 110);
         return () => {
-            timer && window.clearTimeout(timer);
+            window.clearTimeout(timer);
         };
     }, [cloneDragOption, id, top]);
 
@@ -232,18 +210,16 @@ const Temp: React.FC<TempProps> = ({
     }, [id]);
 
     useEffect(() => {
-        transitionFn(() => {
-            setTop(() => {
-                const sameScore = elder.filter((item) => item.score === dragOption.score);
+        setTop(() => {
+            const sameScore = elder.filter((item) => item.score === dragOption.score);
 
-                let height = 0;
-                const margin = 5;
-                for (let i = 0; i < sameScore.length; i++) {
-                    const el = sibling[sameScore[i].code];
-                    height += el?.offsetHeight ? el.offsetHeight + margin : 0;
-                }
-                return height;
-            });
+            let height = 0;
+            const margin = 5;
+            for (let i = 0; i < sameScore.length; i++) {
+                const el = sibling[sameScore[i].code];
+                height += el?.offsetHeight ? el.offsetHeight + margin : 0;
+            }
+            return height;
         });
     }, [dragOption, elder, sibling]);
 
@@ -256,7 +232,7 @@ const Temp: React.FC<TempProps> = ({
         if (!el) {
             return;
         }
-
+        console.log(el, active);
         if (active) {
             const activeEl = document.activeElement;
             if (activeEl !== el) {
@@ -345,8 +321,13 @@ const Temp: React.FC<TempProps> = ({
                     handleDragMove={(res) => {
                         handleDragMove?.(res);
                     }}
-                    onFocus={() => handleFocused(true)}
-                    onBlur={() => handleFocused(false)}
+                    onFocus={() => {
+                        handleFocused(true);
+                    }}
+                    onBlur={() => {
+                        console.log("onBlur");
+                        handleFocused(false);
+                    }}
                 >
                     <span
                         className="ratedOption_container"

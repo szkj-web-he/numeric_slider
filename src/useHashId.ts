@@ -1,19 +1,33 @@
-import { useId } from "react";
+import { useMemo } from "react";
 
 export const useHashId = (prefix?: string): string => {
-    const id = useId();
+    return useMemo(() => {
+        console.log(111, prefix);
+        const l = 10;
+        const psList = window.crypto.getRandomValues(new Uint32Array(l));
+        let val = "";
+        for (let i = 0; i < l; i++) {
+            const v = window
+                .encodeURIComponent(window.encodeURI(window.btoa(String(psList[i]))))
+                .replace(/[^0-9a-z_-]/gi, "");
+            const center = v.length / 2;
+            const start = Math.floor(Math.random() * center);
+            const end = Math.floor(Math.random() * center + (center - 1));
 
-    let start = prefix;
-    if (!start) {
-        const startChar = [65, 97][Math.round(Math.random())];
-        start = String.fromCharCode(Math.round(Math.random() * 26) + startChar);
-    }
-    return id.replace(/[^0-9a-z_]/g, (a) => {
-        let str = start as string;
-        const arr = a.split("");
-        for (let i = 0; i < arr.length; i++) {
-            str += arr[i].charCodeAt(0);
+            val += v.slice(start, end);
         }
-        return str;
-    });
+
+        let value = "";
+        for (let i = 0; i < length; i++) {
+            const index = Math.floor(Math.random() * val.length - 1);
+            value += val.slice(index, index + 1);
+        }
+
+        value += `_${Date.now().toString(36)}`;
+
+        if (prefix) {
+            return `${prefix}-${value}`;
+        }
+        return value;
+    }, [prefix]);
 };

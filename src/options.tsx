@@ -9,7 +9,6 @@
 import React from "react";
 import { comms } from ".";
 import { useMobileStatus } from "./isMobileContext";
-import Option from "./item";
 import { ScrollComponent } from "./Scroll";
 import { OptionProps } from "./type";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
@@ -43,9 +42,11 @@ const Temp: React.FC<TempProps> = ({ setList, list }) => {
         <div className="options_items">
             {comms.config.options?.map((item) => {
                 return (
-                    <Option
+                    <div
                         key={item.code}
-                        active={list.some((option) => option.code === item.code)}
+                        className={`item${
+                            list.some((option) => option.code === item.code) ? " active" : ""
+                        }`}
                         onClick={() => handleClick(item)}
                     >
                         <span
@@ -53,7 +54,7 @@ const Temp: React.FC<TempProps> = ({ setList, list }) => {
                                 __html: item.content,
                             }}
                         />
-                    </Option>
+                    </div>
                 );
             })}
         </div>
