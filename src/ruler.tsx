@@ -33,6 +33,8 @@ const Temp: React.FC<TempProps> = ({ setScaleRange }) => {
 
     const hashId = useHashId("ruler_");
 
+    const destroy = useRef(false);
+
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
@@ -56,6 +58,7 @@ const Temp: React.FC<TempProps> = ({ setScaleRange }) => {
         return () => {
             timer.current && window.clearTimeout(timer.current);
             styleRef.current?.remove();
+            destroy.current = true;
         };
     }, []);
 
@@ -109,6 +112,9 @@ const Temp: React.FC<TempProps> = ({ setScaleRange }) => {
         }
 
         timer.current = window.setTimeout(() => {
+            if (destroy.current) {
+                return;
+            }
             {
                 document.body.offsetHeight;
             }

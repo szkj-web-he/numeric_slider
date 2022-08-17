@@ -61,11 +61,15 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange, onChange }) => {
 
     useLayoutEffect(() => {
         scoreDragRef.current = deepCloneData(scoreDrag);
-
+        let end = false;
         const timer = window.setTimeout(() => {
+            if (end) {
+                return;
+            }
             changeFn.current(scoreDragRef.current);
         });
         return () => {
+            end = true;
             window.clearTimeout(timer);
         };
     }, [scoreDrag]);
@@ -253,8 +257,11 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange, onChange }) => {
             option.left = rangeVal.left;
             option.score = rangeVal.score;
         };
-
+        let end = false;
         const fn = () => {
+            if (end) {
+                return;
+            }
             setScoreDrag((pre) => {
                 for (let i = 0; i < pre.length; i++) {
                     matchOption(pre[i]);
@@ -270,6 +277,7 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange, onChange }) => {
 
         window.addEventListener("resize", main);
         return () => {
+            end = true;
             window.addEventListener("resize", main);
             timer && window.clearTimeout(timer);
         };
