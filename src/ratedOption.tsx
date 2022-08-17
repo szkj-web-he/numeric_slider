@@ -228,23 +228,28 @@ const Temp: React.FC<TempProps> = ({
     }, [dragOption, elder, sibling]);
 
     useEffect(() => {
-        const node = ref.current;
-        if (!node) {
-            return;
-        }
-        const el = node.children[0] instanceof HTMLElement ? node.children[0] : null;
-        if (!el) {
-            return;
-        }
-
-        if (active) {
-            const activeEl = document.activeElement;
-            if (activeEl !== el) {
-                el.focus({
-                    preventScroll: true,
-                });
+        const timerFocus = window.setTimeout(() => {
+            const node = ref.current;
+            if (!node) {
+                return;
             }
-        }
+            const el = node.children[0] instanceof HTMLElement ? node.children[0] : null;
+            if (!el) {
+                return;
+            }
+
+            if (active) {
+                const activeEl = document.activeElement;
+                if (activeEl !== el) {
+                    el.focus({
+                        preventScroll: true,
+                    });
+                }
+            }
+        });
+        return () => {
+            timerFocus && window.clearTimeout(timerFocus);
+        };
     }, [active]);
 
     useEffect(() => {
@@ -326,9 +331,11 @@ const Temp: React.FC<TempProps> = ({
                         handleDragMove?.(res);
                     }}
                     onFocus={() => {
+                        console.log("onFocus", dragOption.content);
                         handleFocused(true);
                     }}
                     onBlur={() => {
+                        console.log("onBlur", dragOption.content);
                         handleFocused(false);
                     }}
                 >
