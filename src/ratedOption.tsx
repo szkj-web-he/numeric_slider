@@ -331,11 +331,9 @@ const Temp: React.FC<TempProps> = ({
                         handleDragMove?.(res);
                     }}
                     onFocus={() => {
-                        console.log("onFocus", dragOption.content);
                         handleFocused(true);
                     }}
                     onBlur={() => {
-                        console.log("onBlur", dragOption.content);
                         handleFocused(false);
                     }}
                 >
