@@ -93,7 +93,11 @@ const Temp: React.FC<TempProps> = ({
 
     useEffect(() => {
         const node = ref.current;
+        let end = false;
         const fn = () => {
+            if (end) {
+                return;
+            }
             styleRef.current?.remove();
             node?.classList.remove(id);
 
@@ -139,60 +143,60 @@ const Temp: React.FC<TempProps> = ({
         fn();
         const timer = window.setTimeout(fn, 110);
         return () => {
+            end = true;
             window.clearTimeout(timer);
         };
     }, [cloneDragOption, id, top]);
 
     useEffect(() => {
+        const end = false;
         let style: HTMLStyleElement | null = null;
         const node = ref.current;
+
         const fn = () => {
+            if (end) {
+                return;
+            }
             style?.remove();
             node?.classList.remove(id);
 
-            const body = ref.current;
-            if (!body) {
+            if (!node) {
                 return;
             }
 
-            let el: HTMLElement | null = null;
-            for (let i = 0; i < body.children.length; ) {
-                const item = body.children[i];
+            let children: HTMLElement | null = null;
+            for (let i = 0; i < node.children.length; ) {
+                const item = node.children[i];
                 if (item instanceof HTMLElement) {
-                    el = item;
-                    i = body.children.length;
+                    children = item;
+                    i = node.children.length;
                 } else {
                     ++i;
                 }
             }
 
-            const parent = body.parentElement;
-            if (!el) {
+            if (!children) {
                 return;
             }
-            if (!parent) {
-                return;
+            {
+                document.body.offsetWidth;
             }
-
-            const rect = el.getBoundingClientRect();
-
-            let val = rect.left - rect.width / 2;
-
-            if (rect.left - rect.width / 2 < 5) {
-                val = 5;
+            const rect = children.getBoundingClientRect();
+            let val = 0;
+            if (rect.left < 5) {
+                val = 5 - rect.left;
             } else if (rect.left + rect.width > document.body.offsetWidth - 5) {
-                val = document.body.offsetWidth - 5 - rect.width;
+                val = document.body.offsetWidth - 5 - rect.width - rect.left;
             }
 
-            const pLeft = parent.getBoundingClientRect().left;
-
-            const x = val - pLeft;
-
+            if (val === 0) {
+                return;
+            }
             style = document.createElement("style");
             style.innerHTML = `.${id}{
-            transform:translateX(${x}px)
+            transform:translateX(${val}px)
           }`;
-            body.classList.add(id);
+            node.classList.add(id);
             document.body.append(style);
         };
         let timer: null | number = null;
