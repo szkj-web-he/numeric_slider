@@ -21,6 +21,7 @@ const Temp: React.FC = () => {
     /************* This section will include this component HOOK function *************/
     const [selectOptions, setSelectOptions] = useState<Array<OptionProps>>([]);
 
+    const [activeOption, setActiveOption] = useState<OptionProps>();
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
@@ -32,9 +33,17 @@ const Temp: React.FC = () => {
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
         <div className="main">
-            <Options setList={setSelectOptions} list={selectOptions} />
+            <Options
+                setList={setSelectOptions}
+                list={selectOptions}
+                setActiveOption={setActiveOption}
+            />
             <div className="hr" />
-            <Place scoreOptions={selectOptions} />
+            <Place
+                scoreOptions={selectOptions}
+                activeOption={activeOption}
+                setActiveOption={setActiveOption}
+            />
         </div>
     );
 };

@@ -279,7 +279,6 @@ body {
     align-items: flex-start;
     justify-content: flex-start;
     flex-flow: column nowrap;
-    pointer-events: auto;
 }
 
 .ratedOption_item {
@@ -291,6 +290,7 @@ body {
     font-style: normal;
     font-weight: 400;
     font-size: 14px;
+    pointer-events: auto;
     line-height: 20px;
     background-color: #fff;
     display: flex;

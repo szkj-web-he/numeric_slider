@@ -2,8 +2,9 @@
 /** This section will include all the necessary dependence for this tsx file */
 import React, { forwardRef, useEffect, useLayoutEffect, useRef, useState } from "react";
 import "./style.scss";
-import { setScrollBar } from "./Unit/setScrollBar";
 import { stopSelect } from "./Unit/noSelected";
+import { setScrollBar } from "./Unit/setScrollBar";
+import { useMobile } from "./Unit/useMobile";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -106,6 +107,8 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
         const [focus, setFocus] = useState(false);
 
         const [hover, setHover] = useState(false);
+
+        const mobileStatus = useMobile();
 
         /* <------------------------------------ **** STATE END **** ------------------------------------ */
         /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
@@ -225,19 +228,22 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
          */
         const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
             const node = scrollEl.current;
-            setScrollBar(node);
+
             const el = e.currentTarget;
-            handleBarChange &&
-                handleBarChange({
-                    left: el.scrollLeft,
-                    top: el.scrollTop,
-                    scrollHeight: el.scrollHeight,
-                    scrollWidth: el.scrollWidth,
-                    offsetHeight: el.offsetHeight,
-                    offsetWidth: el.offsetWidth,
-                    clientHeight: el.clientHeight,
-                    clientWidth: el.clientWidth,
-                });
+            handleBarChange?.({
+                left: el.scrollLeft,
+                top: el.scrollTop,
+                scrollHeight: el.scrollHeight,
+                scrollWidth: el.scrollWidth,
+                offsetHeight: el.offsetHeight,
+                offsetWidth: el.offsetWidth,
+                clientHeight: el.clientHeight,
+                clientWidth: el.clientWidth,
+            });
+            if (mobileStatus) {
+                return;
+            }
+            setScrollBar(node);
         };
 
         /**
@@ -245,17 +251,23 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
          * 1. 重新计算滚动条尺寸
          */
         const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+            onMouseEnter?.(e);
+            if (mobileStatus) {
+                return;
+            }
             setScrollBar(e.currentTarget);
             setHover(true);
-            onMouseEnter?.(e);
         };
 
         /**
          * 当鼠标 离开 滚动容器上时
          */
         const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
-            setHover(false);
             onMouseLeave?.(e);
+            if (mobileStatus) {
+                return;
+            }
+            setHover(false);
         };
 
         /**
@@ -282,13 +294,14 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
             document.addEventListener("mousemove", handleHorizontalMove);
             document.addEventListener("mouseup", handleHorizontalUp);
         };
-
         /********************* element ******************************************/
         /**
          * 纵向滚动条
          */
         const verticalBar =
-            hidden === true || (typeof hidden === "object" && hidden?.y === true) ? (
+            mobileStatus ||
+            hidden === true ||
+            (typeof hidden === "object" && hidden?.y === true) ? (
                 <></>
             ) : (
                 <div
@@ -302,7 +315,9 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
          * 横向滚动条
          */
         const horizontalBar =
-            hidden === true || (typeof hidden === "object" && hidden?.x === true) ? (
+            mobileStatus ||
+            hidden === true ||
+            (typeof hidden === "object" && hidden?.x === true) ? (
                 <></>
             ) : (
                 <div
@@ -317,6 +332,7 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
 
         const bodyClassNameList = ["scroll_scrollBody"];
         bodyClassName && bodyClassNameList.push(bodyClassName);
+        mobileStatus && bodyClassNameList.push("scroll_scrollContainer__mobile");
 
         /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
         return (

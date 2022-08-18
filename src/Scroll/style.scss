@@ -66,8 +66,9 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
     box-sizing: border-box;
-
-    &::-webkit-scrollbar {
-        display: none;
+    &:not([class*="scroll_scrollContainer__mobile"]) {
+        &::-webkit-scrollbar {
+            display: none;
+        }
     }
 }

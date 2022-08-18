@@ -16,10 +16,14 @@ import { OptionProps, ScoreRange } from "./type";
 /** This section will include all the interface for this tsx file */
 interface TempProps {
     scoreOptions: OptionProps[];
+
+    setActiveOption: (res?: OptionProps) => void;
+
+    activeOption?: OptionProps;
 }
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
-const Temp: React.FC<TempProps> = ({ scoreOptions }) => {
+const Temp: React.FC<TempProps> = ({ scoreOptions, setActiveOption, activeOption }) => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
 
@@ -40,6 +44,8 @@ const Temp: React.FC<TempProps> = ({ scoreOptions }) => {
             <DragHotspot
                 scoreRange={scoreRange}
                 scoreOptions={scoreOptions}
+                setActiveOption={setActiveOption}
+                activeOption={activeOption}
                 onChange={(res) => {
                     const data: Record<string, number> = {};
                     const arr = comms.config.options ?? [];

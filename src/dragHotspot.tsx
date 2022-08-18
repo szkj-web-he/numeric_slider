@@ -23,10 +23,20 @@ interface TempProps {
      *当分数发生变化的时候
      */
     onChange: (res: ScoreOptions[]) => void;
+
+    setActiveOption: (res?: OptionProps) => void;
+
+    activeOption?: OptionProps;
 }
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
-const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange, onChange }) => {
+const Temp: React.FC<TempProps> = ({
+    scoreOptions,
+    scoreRange,
+    onChange,
+    setActiveOption,
+    activeOption,
+}) => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
     const ref = useRef<HTMLDivElement | null>(null);
@@ -35,13 +45,9 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange, onChange }) => {
 
     const [scoreDrag, setScoreDrag] = useState(transformScoreOptions(scoreOptions));
 
-    const [selectOption, setSelectOption] = useState<OptionProps | undefined>(
-        scoreOptions[scoreOptions.length - 1],
-    );
-
     const dragEl = useRef<Record<string, HTMLDivElement | null>>({});
 
-    const selectOptionRef = useRef(deepCloneData(selectOption));
+    const selectOptionRef = useRef(deepCloneData(activeOption));
 
     const rangeRef = useRef(deepCloneData(scoreRange));
 
@@ -56,8 +62,8 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange, onChange }) => {
     }, [onChange]);
 
     useLayoutEffect(() => {
-        selectOptionRef.current = deepCloneData(selectOption);
-    }, [selectOption]);
+        selectOptionRef.current = deepCloneData(activeOption);
+    }, [activeOption]);
 
     useLayoutEffect(() => {
         scoreDragRef.current = deepCloneData(scoreDrag);
@@ -79,7 +85,6 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange, onChange }) => {
     }, [scoreRange]);
 
     useEffect(() => {
-        setSelectOption(scoreOptions[scoreOptions.length - 1]);
         setScoreDrag((pre) => [...transformScoreOptions(scoreOptions, pre)]);
     }, [scoreOptions]);
 
@@ -288,7 +293,7 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange, onChange }) => {
     /************* This section will include this component general function *************/
 
     const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (!selectOption) {
+        if (!activeOption) {
             return;
         }
 
@@ -316,7 +321,7 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange, onChange }) => {
 
         setScoreDrag((pre) => {
             for (let i = 0; i < pre.length; ) {
-                if (pre[i].code === selectOption.code) {
+                if (pre[i].code === activeOption.code) {
                     pre[i].left = spot.x;
                     pre[i].score = spot.score;
 
@@ -363,15 +368,15 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange, onChange }) => {
                             elder={deepCloneData(scoreDrag).slice(0, n)}
                             handleFocused={(res) => {
                                 if (res) {
-                                    setSelectOption({
+                                    setActiveOption({
                                         code: item.code,
                                         content: item.content,
                                     });
                                 } else {
-                                    setSelectOption(undefined);
+                                    setActiveOption(undefined);
                                 }
                             }}
-                            active={item.code === selectOption?.code}
+                            active={item.code === activeOption?.code}
                             range={scoreRange}
                             handleScoreChange={(score, left) => {
                                 flushSync(() => {

@@ -8,7 +8,6 @@
 /** This section will include all the necessary dependence for this tsx file */
 import React from "react";
 import { comms } from ".";
-import { useMobileStatus } from "./isMobileContext";
 import { ScrollComponent } from "./Scroll";
 import { OptionProps } from "./type";
 import { deepCloneData } from "./unit";
@@ -19,14 +18,14 @@ interface TempProps {
     setList: (res: OptionProps[]) => void;
 
     list: OptionProps[];
+
+    setActiveOption: (res?: OptionProps) => void;
 }
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
-const Temp: React.FC<TempProps> = ({ setList, list }) => {
+const Temp: React.FC<TempProps> = ({ setList, list, setActiveOption }) => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
-
-    const isMobile = useMobileStatus();
 
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
@@ -47,8 +46,10 @@ const Temp: React.FC<TempProps> = ({ setList, list }) => {
         const arr = deepCloneData(list);
 
         if (n >= 0) {
+            setActiveOption(undefined);
             arr.splice(n, 1);
         } else {
+            setActiveOption(deepCloneData(item));
             arr.push({ ...item });
         }
         setList([...arr]);
@@ -82,13 +83,9 @@ const Temp: React.FC<TempProps> = ({ setList, list }) => {
             <div className="options_total">
                 共 <span className="options_totalVal">{comms.config.options?.length ?? 0}</span>项
             </div>
-            {isMobile ? (
-                <div className="options_mobileScroll">{content}</div>
-            ) : (
-                <ScrollComponent hidden={{ x: true }} bodyClassName="options_scrollBody">
-                    {content}
-                </ScrollComponent>
-            )}
+            <ScrollComponent hidden={{ x: true }} bodyClassName="options_scrollBody">
+                {content}
+            </ScrollComponent>
         </div>
     );
 };
