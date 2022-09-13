@@ -6,7 +6,6 @@
  */
 
 import { comms } from ".";
-import { OptionProps } from "./type";
 
 export const deepCloneData = <T>(data: T): T => {
     if (data == null) {
@@ -128,43 +127,27 @@ export const setScale = ():
     return normalScale(minMargin, total, totalScore);
 };
 
-/**
- * 将选中的需要评分的选项转化为
- * 分数: 选项
- * 格式的方法
- *
- *
- */
-
-export interface ScoreOptions extends OptionProps {
-    score: number;
-    left: number;
-}
-
-export const transformScoreOptions = (res: OptionProps[], pre?: ScoreOptions[]): ScoreOptions[] => {
-    const arr: ScoreOptions[] = [];
-    for (let i = 0; i < res.length; i++) {
-        let score = 0;
-        let left = 0;
-        if (pre) {
-            for (let j = 0; j < pre.length; ) {
-                const option = pre[j];
-                if (option.code === res[i].code) {
-                    score = option.score;
-                    left = option.left;
-                    j = pre.length;
-                } else {
-                    ++j;
-                }
-            }
-        }
-
-        arr.push({
-            code: res[i].code,
-            content: res[i].content,
-            left,
-            score,
-        });
+export const drawRect = (
+    ctx: CanvasRenderingContext2D | null,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+): void => {
+    if (!ctx) {
+        return;
     }
-    return arr;
+    const r = 2;
+    ctx.arc(width - r, height - r, r, 0, Math.PI / 2);
+    ctx.lineTo(x + 7 - r, height);
+    ctx.arc(x + 7 - r, height - r, r, Math.PI / 2, (Math.PI / 4) * 3);
+    ctx.lineTo(x, height - 7);
+    ctx.arc(x + r, height - 7, r, (Math.PI / 4) * 3, Math.PI);
+    ctx.lineTo(x, y - r);
+    ctx.arc(x + r, y - r, r, Math.PI, Math.PI + Math.PI / 2);
+    ctx.lineTo(width - 7, y);
+    ctx.arc(width - 7, y + 2, r, Math.PI + Math.PI / 2, Math.PI + (Math.PI / 4) * 3);
+    ctx.lineTo(width, y + 7);
+    ctx.arc(width - r, y + 7, r, Math.PI + (Math.PI / 4) * 3, 2 * Math.PI);
+    ctx.closePath();
 };

@@ -21,6 +21,22 @@ body {
 
 .wrapper {
     background-color: #fff;
+    background-image: url("./Image/bg.png");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    position: relative;
+    &::after {
+        content: "";
+        top: 0;
+        left: 0;
+        opacity: 0.2;
+        background-color: #fff;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        pointer-events: none;
+    }
 }
 
 .question {
@@ -33,16 +49,17 @@ body {
 }
 
 .questionContent {
-    color: #212121;
+    color: #884718;
     font-family: $fontFamily;
     font-style: normal;
     font-size: 20px;
     line-height: 30px;
+    font-weight: 400;
     letter-spacing: 0.2px;
 }
 
 .questionDes {
-    color: #757575;
+    color: #708c74;
     font-family: $fontFamily;
     font-style: normal;
     font-weight: 400;
@@ -77,12 +94,12 @@ body {
     align-items: center;
     letter-spacing: 0.2px;
 
-    color: #bdbdbd;
+    color: #aa931c;
 }
 
 .options_totalVal {
     padding: 0 5px;
-    color: #22a6b3;
+    color: #80aea2;
 }
 
 .options_scrollBody {
@@ -137,6 +154,7 @@ body {
     color: #4d4d4d;
     margin: 8.25px 20px 8.25px 0;
     cursor: pointer;
+    position: relative;
     &.active {
         background-color: #e9f7f8;
         border-color: #22a6b3;
@@ -330,4 +348,11 @@ body {
     left: 0;
     width: 0;
     height: 100%;
+}
+
+.itemBg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
 }
