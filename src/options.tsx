@@ -8,25 +8,24 @@
 /** This section will include all the necessary dependence for this tsx file */
 import React from "react";
 import { comms } from ".";
-import { useMobileStatus } from "./isMobileContext";
 import { ScrollComponent } from "./Scroll";
-import { OptionProps } from "./type";
+import { OptionProps, ScoreOption } from "./type";
 import { deepCloneData } from "./unit";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
 interface TempProps {
-    setList: (res: OptionProps[]) => void;
+    setList: (res: ScoreOption[]) => void;
 
-    list: OptionProps[];
+    list: ScoreOption[];
+
+    setSelectOption: (option: OptionProps) => void;
 }
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
-const Temp: React.FC<TempProps> = ({ setList, list }) => {
+const Temp: React.FC<TempProps> = ({ setList, list, setSelectOption }) => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
-
-    const isMobile = useMobileStatus();
 
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
@@ -49,9 +48,10 @@ const Temp: React.FC<TempProps> = ({ setList, list }) => {
         if (n >= 0) {
             arr.splice(n, 1);
         } else {
-            arr.push({ ...item });
+            arr.push({ ...item, value: 0 });
         }
         setList([...arr]);
+        setSelectOption(deepCloneData(item));
     };
 
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
@@ -82,13 +82,9 @@ const Temp: React.FC<TempProps> = ({ setList, list }) => {
             <div className="options_total">
                 共 <span className="options_totalVal">{comms.config.options?.length ?? 0}</span>项
             </div>
-            {isMobile ? (
-                <div className="options_mobileScroll">{content}</div>
-            ) : (
-                <ScrollComponent hidden={{ x: true }} bodyClassName="options_scrollBody">
-                    {content}
-                </ScrollComponent>
-            )}
+            <ScrollComponent hidden={{ x: true }} bodyClassName="options_scrollBody">
+                {content}
+            </ScrollComponent>
         </div>
     );
 };

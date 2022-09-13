@@ -6,26 +6,22 @@
  */
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { comms } from ".";
-import { ScoreRange } from "./type";
-import { ScaleProps, setScale } from "./unit";
+import { ScaleProps } from "./unit";
 import { useHashId } from "./useHashId";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
 
 interface TempProps {
-    setScaleRange: (res: ScoreRange[]) => void;
+    ruler?: ScaleProps[];
 }
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
-const Temp: React.FC<TempProps> = ({ setScaleRange }) => {
+const Temp: React.FC<TempProps> = ({ ruler }) => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
-    const [scaleData, setScaleData] = useState<ScaleProps[]>();
-
-    const scaleDataRef = useRef<string>();
 
     const styleRef = useRef<HTMLStyleElement>();
 
@@ -38,61 +34,15 @@ const Temp: React.FC<TempProps> = ({ setScaleRange }) => {
     /************* This section will include this component parameter *************/
 
     useEffect(() => {
-        const fn = () => {
-            const data = setScale();
-            if (data && scaleDataRef.current !== JSON.stringify(data)) {
-                setScaleData([...data.scale]);
-                scaleDataRef.current = JSON.stringify(data.scale);
-            }
-        };
-
-        window.addEventListener("resize", fn);
-        return () => {
-            window.removeEventListener("resize", fn);
-        };
-    }, []);
-
-    useEffect(() => {
         return () => {
             timer.current && window.clearTimeout(timer.current);
             styleRef.current?.remove();
         };
     }, []);
 
-    useEffect(() => {
-        if (!scaleData) {
-            return;
-        }
-        const arr: ScoreRange[] = [];
-        let min = -Infinity;
-
-        const start = scaleData?.[0].left ?? 0;
-        const end = scaleData?.[1].left ?? 0;
-        const s = (end - start) / 2;
-
-        for (let i = 0; i < scaleData.length; i++) {
-            arr.push({
-                value: scaleData[i].value,
-                min,
-                max: scaleData[i + 1] ? scaleData[i].left + s : Infinity,
-                x: scaleData[i].left,
-            });
-            min = scaleData[i].left + s;
-        }
-        setScaleRange([...arr]);
-    }, [scaleData, setScaleRange]);
-
     /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
     /************* This section will include this component general function *************/
-
-    {
-        const data = setScale();
-        if (data && scaleDataRef.current !== JSON.stringify(data.scale)) {
-            setScaleData([...data.scale]);
-            scaleDataRef.current = JSON.stringify(data.scale);
-        }
-    }
 
     const matchLastNode = (el: HTMLElement) => {
         const rect = el.getBoundingClientRect();
@@ -134,7 +84,7 @@ const Temp: React.FC<TempProps> = ({ setScaleRange }) => {
     return (
         <div className="rulerContainer">
             <div className="ruler">
-                {scaleData?.map((item) => {
+                {ruler?.map((item) => {
                     if (item.status === 1) {
                         return (
                             <div

@@ -21,6 +21,10 @@ export interface DragMoveProps extends DragPramsProps {
     name?: string;
 }
 
+export interface ScoreOption extends OptionProps {
+    value: number;
+}
+
 /**
  * 每个分数所对应的像素范围
  */
@@ -29,4 +33,13 @@ export interface ScoreRange {
     min: number;
     max: number;
     x: number;
+}
+
+export interface Point {
+    pageX: number;
+    pageY: number;
+    offsetX: number;
+    offsetY: number;
+    clientX: number;
+    clientY: number;
 }

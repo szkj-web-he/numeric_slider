@@ -1,9 +1,18 @@
+/**
+ * @file Scroll component
+ * @date 2022-02-15
+ * @author xuejie.he
+ * @lastModify xuejie.he 2022-02-15
+ */
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
 import React, { forwardRef, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Point } from "../type";
+import { getScrollValue } from "../unit";
 import "./style.scss";
 import { setScrollBar } from "./Unit/setScrollBar";
-import { stopSelect } from "./Unit/noSelected";
+import { useMobile } from "./Unit/useMobile";
+import DragBar from "../Drag";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -59,13 +68,13 @@ export interface ScrollProps extends React.DOMAttributes<HTMLDivElement> {
      */
     hidden?: boolean | { x?: boolean; y?: boolean };
     /**
-     * Prevent event bubbling when mouse is on the bar
-     */
-    stopPropagation?: boolean;
-    /**
      * Is the default position for smooth scrollbars
      */
     isSmooth?: boolean;
+    /**
+     * Prevent event bubbling when mouse is on the bar
+     */
+    stopPropagation?: boolean;
 }
 
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
@@ -83,9 +92,8 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
             className,
             style,
             onMouseEnter,
-            onMouseLeave,
-            stopPropagation = true,
             isSmooth,
+            stopPropagation = true,
             bodyClassName,
             ...props
         },
@@ -99,13 +107,11 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
 
         const smoothRef = useRef(isSmooth);
 
-        const point = useRef(0);
-
-        const selectedFn = useRef<typeof document.onselectstart>(null);
-
         const [focus, setFocus] = useState(false);
 
         const [hover, setHover] = useState(false);
+
+        const mobileStatus = useMobile();
 
         /* <------------------------------------ **** STATE END **** ------------------------------------ */
         /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
@@ -158,86 +164,28 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
         /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
         /************* This section will include this component general function *************/
 
-        const handleVerticalMove = (e: MouseEvent) => {
-            const y = e.pageY;
-
-            let move = y - point.current;
-            point.current = y;
-
-            const node = scrollEl.current;
-            if (node) {
-                move = (move / node.offsetHeight) * node.scrollHeight;
-
-                let value = node.scrollTop + move;
-                if (value < 0) {
-                    value = 0;
-                } else if (value + node.offsetHeight > node.scrollHeight) {
-                    value = node.scrollHeight - node.offsetHeight;
-                }
-
-                node.scrollTo({
-                    top: value,
-                });
-            }
-        };
-
-        const handleVerticalUp = () => {
-            point.current = 0;
-            document.onselectstart = selectedFn.current;
-            selectedFn.current = null;
-            setFocus(false);
-            document.removeEventListener("mousemove", handleVerticalMove);
-            document.removeEventListener("mouseup", handleVerticalUp);
-        };
-
-        const handleHorizontalMove = (e: MouseEvent) => {
-            const x = e.pageX;
-
-            let move = x - point.current;
-            point.current = x;
-
-            const node = scrollEl.current;
-            if (node) {
-                move = (move / node.offsetWidth) * node.scrollWidth;
-                let value = node.scrollLeft + move;
-                if (value < 0) {
-                    value = 0;
-                } else if (value + node.offsetWidth > node.scrollWidth) {
-                    value = node.scrollWidth - node.offsetWidth;
-                }
-                node.scrollTo({
-                    left: value,
-                });
-            }
-        };
-        const handleHorizontalUp = () => {
-            point.current = 0;
-            document.onselectstart = selectedFn.current;
-            selectedFn.current = null;
-            setFocus(false);
-            document.removeEventListener("mousemove", handleHorizontalMove);
-            document.removeEventListener("mouseup", handleHorizontalUp);
-        };
-
         /**
          * 监听滚动
          * @param {React.UIEvent<HTMLDivElement>} e event
          */
         const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
             const node = scrollEl.current;
-            setScrollBar(node);
+
             const el = e.currentTarget;
-            handleBarChange &&
-                handleBarChange({
-                    left: el.scrollLeft,
-                    top: el.scrollTop,
-                    scrollHeight: el.scrollHeight,
-                    scrollWidth: el.scrollWidth,
-                    offsetHeight: el.offsetHeight,
-                    offsetWidth: el.offsetWidth,
-                    clientHeight: el.clientHeight,
-                    clientWidth: el.clientWidth,
-                });
+            handleBarChange?.({
+                left: el.scrollLeft,
+                top: el.scrollTop,
+                scrollHeight: el.scrollHeight,
+                scrollWidth: el.scrollWidth,
+                offsetHeight: el.offsetHeight,
+                offsetWidth: el.offsetWidth,
+                clientHeight: el.clientHeight,
+                clientWidth: el.clientWidth,
+            });
+            if (mobileStatus) {
+                return;
+            }
+            setScrollBar(node);
         };
 
         /**
@@ -245,42 +193,77 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
          * 1. 重新计算滚动条尺寸
          */
         const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+            onMouseEnter?.(e);
+            if (mobileStatus) {
+                return;
+            }
             setScrollBar(e.currentTarget);
             setHover(true);
-            onMouseEnter?.(e);
         };
 
         /**
          * 当鼠标 离开 滚动容器上时
          */
-        const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+        const handleMouseLeave = () => {
+            if (mobileStatus) {
+                return;
+            }
             setHover(false);
-            onMouseLeave?.(e);
         };
 
         /**
-         * 鼠标在纵向滚动条上 按下时
-         * @param e
+         * 鼠标在纵轴滚动条上
+         * 拖拽中
          */
-        const handleMouseDownOnVerticalBar = (e: React.MouseEvent<HTMLDivElement>) => {
-            stopSelect(e, selectedFn, stopPropagation);
+        const handleDragMoveOfVertical = ({ pageY, offsetY }: Point) => {
+            const node = scrollEl.current;
+            if (!node) {
+                return;
+            }
+            const y = pageY - offsetY;
 
-            point.current = e.pageY;
-            setFocus(true);
-            document.addEventListener("mousemove", handleVerticalMove);
-            document.addEventListener("mouseup", handleVerticalUp);
+            const { top } = node.getBoundingClientRect();
+
+            const scrollData = getScrollValue();
+
+            const val = y - (top + scrollData.y);
+
+            node.scrollTo({
+                top: (node.scrollHeight / node.offsetHeight) * val,
+            });
         };
 
         /**
-         * 鼠标在横向滚动条上 按下时
-         * @param e
+         * 展示滚动条
          */
-        const handleMouseDownOnHorizontalBar = (e: React.MouseEvent<HTMLDivElement>) => {
-            stopSelect(e, selectedFn, stopPropagation);
+        const showBar = () => {
             setFocus(true);
-            point.current = e.pageX;
-            document.addEventListener("mousemove", handleHorizontalMove);
-            document.addEventListener("mouseup", handleHorizontalUp);
+        };
+        /**
+         * 鼠标在横向滚动条上
+         * 拖拽中
+         */
+        const handleDragMoveOfHorizontal = ({ pageX, offsetX }: Point) => {
+            const node = scrollEl.current;
+            if (!node) {
+                return;
+            }
+
+            const x = pageX - offsetX;
+
+            const { left } = node.getBoundingClientRect();
+
+            const scrollData = getScrollValue();
+
+            const val = x - (left + scrollData.x);
+
+            node.scrollTo({
+                left: (node.scrollWidth / node.offsetWidth) * val,
+            });
+        };
+
+        const hiddenBar = () => {
+            setFocus(false);
         };
 
         /********************* element ******************************************/
@@ -291,10 +274,15 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
             hidden === true || (typeof hidden === "object" && hidden?.y === true) ? (
                 <></>
             ) : (
-                <div
-                    className={`scroll_scrollBar__vertical${hover || focus ? " active" : ""}`}
-                    onMouseDown={handleMouseDownOnVerticalBar}
-                    onClick={(e) => stopPropagation && e.stopPropagation()}
+                <DragBar
+                    className={`scroll_scrollBar__vertical${
+                        hover || focus ? ` scroll_scrollBar__active` : ""
+                    }`}
+                    handleDragStart={showBar}
+                    handleDragMove={handleDragMoveOfVertical}
+                    handleDragEnd={hiddenBar}
+                    handleDragCancel={hiddenBar}
+                    stopPropagation={stopPropagation}
                 />
             );
 
@@ -305,10 +293,15 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
             hidden === true || (typeof hidden === "object" && hidden?.x === true) ? (
                 <></>
             ) : (
-                <div
-                    className={`scroll_scrollBar__horizontal${hover || focus ? " active" : ""}`}
-                    onMouseDown={handleMouseDownOnHorizontalBar}
-                    onClick={(e) => stopPropagation && e.stopPropagation()}
+                <DragBar
+                    className={`scroll_scrollBar__horizontal${
+                        hover || focus ? ` scroll_scrollBar__active` : ""
+                    }`}
+                    handleDragStart={showBar}
+                    handleDragMove={handleDragMoveOfHorizontal}
+                    handleDragEnd={hiddenBar}
+                    handleDragCancel={hiddenBar}
+                    stopPropagation={stopPropagation}
                 />
             );
 
@@ -335,9 +328,7 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
                     className={bodyClassNameList.join(" ")}
                     style={Object.assign(
                         {},
-
                         style,
-
                         hidden === true ||
                             (typeof hidden === "object" && hidden?.x === true
                                 ? { overflowX: "hidden" }

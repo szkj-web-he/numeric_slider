@@ -1,271 +1,277 @@
 /**
- * @file Drag
- * @date 2022-06-22
+ * @file 拖拽的柄
+ * @date 2022-09-07
  * @author xuejie.he
- * @lastModify xuejie.he 2022-06-22
+ * @lastModify xuejie.he 2022-09-07
  */
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
 import React, { forwardRef, useRef } from "react";
-import { stopSelect } from "../Scroll/Unit/noSelected";
-import { DragMoveProps, DragPramsProps, PointProps } from "../type";
+import { Point } from "../type";
 import { getScrollValue } from "../unit";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
-export interface DragProps extends React.HTMLAttributes<HTMLDivElement> {
-    handleDragStart?: (res: DragPramsProps) => void;
-
-    handleDragMove?: (res: DragMoveProps) => void;
-
-    handleDragEnd?: (res: DragPramsProps) => void;
-
-    children?: React.ReactNode;
-
-    active: boolean;
+interface TempProps extends React.HTMLAttributes<HTMLDivElement> {
+    /**
+     * 开始拖拽
+     */
+    handleDragStart?: (res: Point) => void;
+    /**
+     * 拖拽移动中
+     */
+    handleDragMove?: (res: Point) => void;
+    /**
+     * 拖拽结束
+     */
+    handleDragEnd?: (res: Point) => void;
+    /**
+     * 拖拽取消
+     */
+    handleDragCancel?: () => void;
+    /**
+     * 是否阻止冒泡
+     */
+    stopPropagation?: boolean;
 }
-
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
-export const Drag = forwardRef<HTMLDivElement, DragProps>(
+const Temp = forwardRef<HTMLDivElement, TempProps>(
     (
         {
-            children,
             handleDragStart,
-            handleDragEnd,
             handleDragMove,
+            handleDragEnd,
+            handleDragCancel,
             onMouseDown,
             onTouchStart,
             onTouchMove,
             onTouchEnd,
-            active,
-            className,
-            onFocus,
-            onBlur,
+            onTouchCancel,
+            stopPropagation = true,
             ...props
         },
         ref,
     ) => {
-        Drag.displayName = "Drag";
+        Temp.displayName = "DragBar";
         /* <------------------------------------ **** STATE START **** ------------------------------------ */
         /************* This section will include this component HOOK function *************/
+
+        const touchStatus = useRef(false);
+
         const mouseDownStatus = useRef(false);
 
-        const touchStartStatus = useRef(false);
-
-        const selectedFn = useRef<typeof document.onselectstart>(null);
-
-        const point = useRef<PointProps>({
-            offsetX: 0,
-            offsetY: 0,
+        const offset = useRef({
             x: 0,
             y: 0,
-            width: 0,
-            height: 0,
         });
 
+        const selectedFn = useRef<typeof document.onselectstart>(null);
         /* <------------------------------------ **** STATE END **** ------------------------------------ */
         /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
         /************* This section will include this component parameter *************/
-
         /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
         /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
         /************* This section will include this component general function *************/
 
-        /**
-         * 移动的通用事件
-         */
-        const handleMove = (x: number, y: number, clientX: number, clientY: number) => {
-            point.current.x = x - point.current.offsetX;
-            point.current.y = y - point.current.offsetY;
-            handleDragMove?.({
-                x,
-                y,
-                clientX,
-                clientY,
-                width: point.current.width,
-                height: point.current.height,
-                offsetX: point.current.offsetX,
-                offsetY: point.current.offsetY,
-            });
+        const removeSelect = (e: React.TouchEvent | React.MouseEvent) => {
+            if (stopPropagation) {
+                e.stopPropagation();
+            }
+            e.nativeEvent.stopImmediatePropagation();
+            window.getSelection()?.removeAllRanges();
+            selectedFn.current = document.onselectstart;
+            document.onselectstart = () => false;
         };
 
-        /**
-         * 鼠标移动
-         */
-        const handleMouseMove = (e: MouseEvent) => {
-            handleMove(e.pageX, e.pageY, e.clientX, e.clientY);
-        };
-
-        // 当鼠标 或者手 弹起时的通用事件
-        const handleUp = (x: number, y: number, clientX: number, clientY: number) => {
-            handleDragEnd?.({
-                x,
-                y,
-                clientX,
-                clientY,
-                width: point.current.width,
-                height: point.current.height,
-                offsetX: point.current.offsetX,
-                offsetY: point.current.offsetY,
-            });
-
+        const resetSelect = () => {
             document.onselectstart = selectedFn.current;
-            point.current = {
+            selectedFn.current = null;
+            offset.current = {
                 x: 0,
                 y: 0,
-                offsetX: 0,
-                offsetY: 0,
-                width: 0,
-                height: 0,
             };
-            selectedFn.current = null;
-        };
-
-        /**
-         * 鼠标松开
-         */
-        const handleMouseUp = (e: MouseEvent) => {
-            handleUp(e.pageX, e.pageY, e.clientX, e.clientY);
+            touchStatus.current = false;
             mouseDownStatus.current = false;
-            document.removeEventListener("mousemove", handleMouseMove);
-            document.removeEventListener("mouseup", handleMouseUp);
         };
 
-        // 手或者鼠标 按下的通用事件
-        const handleDown = (
-            e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>,
-        ) => {
-            stopSelect(e, selectedFn, true);
-
-            const scrollData = getScrollValue();
-            const rect = e.currentTarget.getBoundingClientRect();
-            const rectX = rect.left + scrollData.x;
-            const rectY = rect.top + scrollData.y;
-
-            let x = 0;
-            let y = 0;
-
-            if ("pageX" in e) {
-                x = e.pageX;
-                y = e.pageY;
-
-                handleDragStart?.({
-                    x,
-                    y,
-                    width: point.current.width,
-                    height: point.current.height,
-                    clientX: e.clientX,
-                    clientY: e.clientY,
-                    offsetX: point.current.offsetX,
-                    offsetY: point.current.offsetY,
-                });
-            } else {
-                const position = e.changedTouches[0];
-                x = position.pageX;
-                y = position.pageY;
-                handleDragStart?.({
-                    x,
-                    y,
-                    width: point.current.width,
-                    height: point.current.height,
-                    clientX: position.clientX,
-                    clientY: position.clientY,
-                    offsetX: point.current.offsetX,
-                    offsetY: point.current.offsetY,
-                });
-            }
-
-            point.current = {
-                offsetX: x - rectX,
-                offsetY: y - rectY,
-                x: rectX,
-                y: rectY,
-                width: rect.width,
-                height: rect.height,
-            };
-        };
-
-        /**
-         * 鼠标按下
-         */
-        const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-            onMouseDown?.(e);
-            if (touchStartStatus.current) {
-                return;
-            }
-            handleDown(e);
-            document.addEventListener("mousemove", handleMouseMove);
-            document.addEventListener("mouseup", handleMouseUp);
-
-            mouseDownStatus.current = true;
-        };
-
-        /**
-         * 触摸开始
-         */
         const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
             onTouchStart?.(e);
             if (mouseDownStatus.current) {
                 return;
             }
-            handleDown(e);
-            touchStartStatus.current = true;
+
+            touchStatus.current = true;
+            removeSelect(e);
+
+            const scrollData = getScrollValue();
+            const rect = e.currentTarget.getBoundingClientRect();
+            const left = rect.left + scrollData.x;
+            const top = rect.top + scrollData.y;
+            const event = e.changedTouches[0];
+            offset.current = {
+                x: event.pageX - left,
+                y: event.pageY - top,
+            };
+
+            handleDragStart?.({
+                offsetX: offset.current.x,
+                offsetY: offset.current.y,
+                pageX: event.pageX,
+                pageY: event.pageY,
+                clientX: event.clientX,
+                clientY: event.clientY,
+            });
+
+            window.addEventListener("blur", handleTouchBlur);
         };
 
-        /**
-         * 移动触摸
-         */
-        const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-            onTouchMove?.(e);
-
-            if (!touchStartStatus.current) {
+        const handleTouchBlur = () => {
+            if (!touchStatus.current) {
                 return;
             }
-            const position = e.changedTouches[0];
-            handleMove(position.pageX, position.pageY, position.clientX, position.clientY);
+            resetSelect();
+            handleDragCancel?.();
+            window.removeEventListener("blur", handleTouchBlur);
         };
 
-        /**
-         * 触摸结束
-         */
+        const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+            onTouchMove?.(e);
+            if (!touchStatus.current) {
+                return;
+            }
+
+            const event = e.changedTouches[0];
+
+            handleDragMove?.({
+                offsetX: offset.current.x,
+                offsetY: offset.current.y,
+                pageX: event.pageX,
+                pageY: event.pageY,
+                clientX: event.clientX,
+                clientY: event.clientY,
+            });
+        };
+
         const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
             onTouchEnd?.(e);
 
-            if (!touchStartStatus.current) {
+            if (!touchStatus.current) {
                 return;
             }
-            const position = e.changedTouches[0];
-            handleUp(position.pageX, position.pageY, position.clientX, position.clientY);
-            touchStartStatus.current = false;
+
+            const event = e.changedTouches[0];
+            resetSelect();
+            handleDragEnd?.({
+                offsetX: offset.current.x,
+                offsetY: offset.current.y,
+                pageX: event.pageX,
+                pageY: event.pageY,
+                clientX: event.clientX,
+                clientY: event.clientY,
+            });
+            window.removeEventListener("blur", handleTouchBlur);
+        };
+
+        const handleTouchCancel = (e: React.TouchEvent<HTMLDivElement>) => {
+            onTouchCancel?.(e);
+
+            if (!touchStatus.current) {
+                return;
+            }
+            resetSelect();
+            handleDragCancel?.();
+            window.removeEventListener("blur", handleTouchBlur);
+        };
+
+        const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+            onMouseDown?.(e);
+            if (touchStatus.current) {
+                return;
+            }
+            removeSelect(e);
+
+            const scrollData = getScrollValue();
+            const rect = e.currentTarget.getBoundingClientRect();
+            const left = rect.left + scrollData.x;
+            const top = rect.top + scrollData.y;
+
+            offset.current = {
+                x: e.pageX - left,
+                y: e.pageY - top,
+            };
+            handleDragStart?.({
+                offsetX: offset.current.x,
+                offsetY: offset.current.y,
+                pageX: e.pageX,
+                pageY: e.pageY,
+                clientX: e.clientX,
+                clientY: e.clientY,
+            });
+
+            mouseDownStatus.current = true;
+            document.addEventListener("mousemove", handleMouseMove);
+            document.addEventListener("mouseup", handleMouseUp);
+            window.addEventListener("blur", handleMouseCancel);
+        };
+
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!mouseDownStatus.current) {
+                return;
+            }
+            handleDragMove?.({
+                offsetX: offset.current.x,
+                offsetY: offset.current.y,
+                pageX: e.pageX,
+                pageY: e.pageY,
+                clientX: e.clientX,
+                clientY: e.clientY,
+            });
+        };
+
+        const handleMouseUp = (e: MouseEvent) => {
+            if (!mouseDownStatus.current) {
+                return;
+            }
+            handleDragEnd?.({
+                offsetX: offset.current.x,
+                offsetY: offset.current.y,
+                pageX: e.pageX,
+                pageY: e.pageY,
+                clientX: e.clientX,
+                clientY: e.clientY,
+            });
+            resetSelect();
+            document.removeEventListener("mousemove", handleMouseMove);
+            document.removeEventListener("mouseup", handleMouseUp);
+            window.removeEventListener("blur", handleMouseCancel);
+        };
+
+        const handleMouseCancel = () => {
+            if (!mouseDownStatus.current) {
+                return;
+            }
+            resetSelect();
+            handleDragCancel?.();
+            document.removeEventListener("mousemove", handleMouseMove);
+            document.removeEventListener("mouseup", handleMouseUp);
+            window.removeEventListener("blur", handleMouseCancel);
         };
 
         /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
-        const classList: string[] = [];
-        className && classList.push(className);
-        active && classList.push("active");
         return (
             <div
-                {...props}
                 ref={ref}
-                onMouseDown={handleMouseDown}
                 onTouchStart={handleTouchStart}
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
-                tabIndex={-1}
-                onFocus={(e) => {
-                    onFocus?.(e);
-                }}
-                onBlur={(e) => {
-                    onBlur?.(e);
-                }}
-                className={classList.join(" ")}
-            >
-                {children}
-            </div>
+                onTouchCancel={handleTouchCancel}
+                onMouseDown={handleMouseDown}
+                {...props}
+            />
         );
     },
 );
-
+Temp.displayName = "DragBar";
 /* <------------------------------------ **** FUNCTION COMPONENT END **** ------------------------------------ */
-Drag.displayName = "Drag";
+export default Temp;
