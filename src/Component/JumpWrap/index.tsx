@@ -140,10 +140,7 @@ const JumpWrap: React.FC<ScrollProps> = ({ children, style, ...props }) => {
                             jumpTo(activeIndex.current - 1);
                         }}
                     >
-                        <Triangle
-                            className="top_triangle"
-                            color={topActive ? "#4D4D4D" : "#EBEBEB"}
-                        />
+                        <Triangle className="top_triangle" active={topActive} placement="top" />
                     </div>
                     <div
                         className="toBottom_button"
@@ -157,7 +154,8 @@ const JumpWrap: React.FC<ScrollProps> = ({ children, style, ...props }) => {
                     >
                         <Triangle
                             className="bottom_triangle"
-                            color={bottomActive && !isBottom ? "#4D4D4D" : "#EBEBEB"}
+                            active={bottomActive && !isBottom}
+                            placement="bottom"
                         />
                     </div>
                 </div>
