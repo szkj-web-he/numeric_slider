@@ -164,7 +164,7 @@ body {
     font-size: 16px;
     line-height: 24px;
     letter-spacing: 0.2px;
-    color: #4d4d4d;
+    color: #884718;
     @include Padding();
     margin-bottom: 12.5px;
 }
@@ -379,4 +379,19 @@ body {
     object-position: center center;
     position: absolute;
     top: -17px;
+}
+
+.group_top {
+    font-family: $fontFamily;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+    display: flex;
+    align-items: center;
+    letter-spacing: 0.2px;
+    color: #884718;
+    @include Padding();
+    margin-bottom: 24px;
+    margin-top: 32px;
 }
