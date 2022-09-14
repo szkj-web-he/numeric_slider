@@ -1,12 +1,11 @@
 import React from "react";
-import "./elementsFromPointPolyfill.ts";
 import "./font.scss";
 import "./style.scss";
 
 import { ConfigYML, PluginComms } from "@possie-engine/dr-plugin-sdk";
+import JumpWrap from "./Component/JumpWrap";
 import Header from "./header";
 import MainContent from "./main";
-import { ScrollComponent } from "./Scroll";
 
 export const comms = new PluginComms({
     defaultConfig: new ConfigYML(),
@@ -14,9 +13,9 @@ export const comms = new PluginComms({
     config: {
         question?: string;
         instruction?: string;
-        optionsInstruction?: string;
-        options?: Array<{ code: string; content: string }>;
+        options?: Array<Array<{ code: string; content: string }>>;
         totalScore?: number;
+        optionsInstruction?: string;
     };
     state: unknown;
     renderOnReady: (res: React.ReactNode) => void;
@@ -35,16 +34,12 @@ const Main: React.FC = () => {
     /************* This section will include this component general function *************/
 
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
-
-    const content = (
-        <>
-            <Header />
-            <MainContent />
-        </>
-    );
     return (
         <div className="wrapper">
-            <ScrollComponent hidden={{ x: true }}>{content}</ScrollComponent>
+            <JumpWrap>
+                <Header />
+                <MainContent />
+            </JumpWrap>
         </div>
     );
 };

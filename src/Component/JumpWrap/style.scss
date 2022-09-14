@@ -1,0 +1,38 @@
+.floating_button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-flow: row nowrap;
+    z-index: 10;
+}
+
+@mixin button {
+    flex: 0 0 auto;
+    background: #ffffff;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    box-shadow: 0px 2.58824px 10.3529px rgba(26, 26, 26, 0.08),
+        0px 2.58824px 5.17647px rgba(26, 26, 26, 0.03);
+    cursor: pointer;
+}
+
+.toTop_button {
+    margin-right: 16px;
+    @include button();
+}
+
+.toBottom_button {
+    @include button();
+}
+
+.top_triangle {
+    transform: rotate(180deg);
+}

@@ -6,11 +6,10 @@
  */
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import React, { useRef } from "react";
-import { useEffect } from "react";
-import { drawRect } from "./unit";
+import React, { useEffect, useRef } from "react";
 import cloud1 from "./Image/btn_left.png";
 import cloud2 from "./Image/btn_right.png";
+import { drawRect } from "./unit";
 
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
@@ -23,60 +22,90 @@ const Temp: React.FC = () => {
     /************* This section will include this component HOOK function *************/
     const ref = useRef<HTMLCanvasElement | null>(null);
 
+    const state = useRef<string>();
+
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
     useEffect(() => {
-        const el = ref.current;
-        if (!el) {
-            return;
-        }
+        const draw = () => {
+            const el = ref.current;
+            if (!el) {
+                return;
+            }
 
-        const parent = el.parentElement;
-        if (!parent) {
-            return;
-        }
-        const width = parent.offsetWidth;
-        const height = parent.offsetHeight;
+            const parent = el.parentElement;
+            if (!parent) {
+                return;
+            }
+            const width = parent.offsetWidth;
+            const height = parent.offsetHeight;
 
-        el.width = width;
-        el.height = height;
+            el.width = width;
+            el.height = height;
 
-        const ctx = el.getContext("2d");
-        if (!ctx) {
-            return;
-        }
-        ctx.beginPath();
-        const outStokeColor = ctx.createLinearGradient(width / 2, 0, width / 2, height);
-        outStokeColor.addColorStop(0, "#E6DF39");
-        outStokeColor.addColorStop(1, "rgba(246,242,128,0.78)");
+            state.current = `{width:${width},height:${height}}`;
 
-        ctx.strokeStyle = outStokeColor;
+            const ctx = el.getContext("2d");
+            if (!ctx) {
+                return;
+            }
+            ctx.clearRect(0, 0, width, height);
+            ctx.beginPath();
+            const outStokeColor = ctx.createLinearGradient(width / 2, 0, width / 2, height);
+            outStokeColor.addColorStop(0, "#E6DF39");
+            outStokeColor.addColorStop(1, "rgba(246,242,128,0.78)");
 
-        const outFillColor = ctx.createLinearGradient(width / 2, 0, width / 2, height);
-        outFillColor.addColorStop(0, "#FEB662");
-        outFillColor.addColorStop(1, "#D93504");
-        ctx.fillStyle = outFillColor;
-        drawRect(ctx, 0.6, 0.6, width - 0.6, height - 0.6);
+            ctx.strokeStyle = outStokeColor;
 
-        ctx.stroke();
-        ctx.fill();
+            const outFillColor = ctx.createLinearGradient(width / 2, 0, width / 2, height);
+            outFillColor.addColorStop(0, "#FEB662");
+            outFillColor.addColorStop(1, "#D93504");
+            ctx.fillStyle = outFillColor;
+            drawRect(ctx, 0.6, 0.6, width - 0.6, height - 0.6);
 
-        ctx.beginPath();
-        const innerStokeColor = ctx.createLinearGradient(9, height - 2, width - 11.5, 2);
-        innerStokeColor.addColorStop(0, "#852C10");
-        innerStokeColor.addColorStop(0.8, "rgba(255,245,0,0.77)");
+            ctx.stroke();
+            ctx.fill();
 
-        ctx.strokeStyle = innerStokeColor;
+            ctx.beginPath();
+            const innerStokeColor = ctx.createLinearGradient(9, height - 2, width - 11.5, 2);
+            innerStokeColor.addColorStop(0, "#852C10");
+            innerStokeColor.addColorStop(0.8, "rgba(255,245,0,0.77)");
 
-        const innerFillColor = ctx.createLinearGradient(width / 2, height - 4, width / 2, 4);
-        innerFillColor.addColorStop(0, "#FBF4D7");
-        innerFillColor.addColorStop(1, "#ECCE8E");
-        ctx.fillStyle = innerFillColor;
-        drawRect(ctx, 4, 4, width - 4, height - 4);
+            ctx.strokeStyle = innerStokeColor;
 
-        ctx.stroke();
-        ctx.fill();
+            const innerFillColor = ctx.createLinearGradient(width / 2, height - 4, width / 2, 4);
+            innerFillColor.addColorStop(0, "#FBF4D7");
+            innerFillColor.addColorStop(1, "#ECCE8E");
+            ctx.fillStyle = innerFillColor;
+            drawRect(ctx, 4, 4, width - 4, height - 4);
+
+            ctx.stroke();
+            ctx.fill();
+        };
+
+        const fn = () => {
+            const el = ref.current;
+            if (!el) {
+                return;
+            }
+
+            const parent = el.parentElement;
+            if (!parent) {
+                return;
+            }
+            const width = parent.offsetWidth;
+            const height = parent.offsetHeight;
+            const str = `{width:${width},height:${height}}`;
+            if (str !== state.current) {
+                draw();
+            }
+        };
+        draw();
+        window.addEventListener("resize", fn);
+        return () => {
+            window.removeEventListener("resize", fn);
+        };
     }, []);
 
     /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
