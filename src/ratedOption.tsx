@@ -307,7 +307,7 @@ const Temp: React.FC<TempProps> = ({
                         handleFocused(false);
                     }}
                 >
-                    <ItemBg />
+                    <ItemBg active={active} />
                     <span
                         className="itemContent"
                         dangerouslySetInnerHTML={{

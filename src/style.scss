@@ -136,10 +136,9 @@ body {
     margin: 8px 16px 8px 0;
     cursor: pointer;
     position: relative;
-    // &.active {
-    //     background-color: #e9f7f8;
-    //     border-color: #22a6b3;
-    // }
+    &.active {
+        color: #fffdc5;
+    }
     .itemContent {
         position: relative;
         z-index: 2;
@@ -298,6 +297,9 @@ body {
     white-space: pre-wrap;
     cursor: pointer;
     flex-flow: row wrap;
+    &.active {
+        color: #fffdc5;
+    }
     .itemContent {
         position: relative;
         z-index: 3;

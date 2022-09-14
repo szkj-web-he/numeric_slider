@@ -14,10 +14,13 @@ import { drawRect } from "./unit";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
+interface TempProps {
+    active: boolean;
+}
 
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
-const Temp: React.FC = () => {
+const Temp: React.FC<TempProps> = ({ active }) => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
     const ref = useRef<HTMLCanvasElement | null>(null);
@@ -75,8 +78,13 @@ const Temp: React.FC = () => {
             ctx.strokeStyle = innerStokeColor;
 
             const innerFillColor = ctx.createLinearGradient(width / 2, height - 4, width / 2, 4);
-            innerFillColor.addColorStop(0, "#FBF4D7");
-            innerFillColor.addColorStop(1, "#ECCE8E");
+            if (active) {
+                innerFillColor.addColorStop(0, "#DC5221");
+                innerFillColor.addColorStop(1, "#FFE3A8");
+            } else {
+                innerFillColor.addColorStop(0, "#FBF4D7");
+                innerFillColor.addColorStop(1, "#ECCE8E");
+            }
             ctx.fillStyle = innerFillColor;
             drawRect(ctx, 4, 4, width - 4, height - 4);
 
@@ -106,7 +114,7 @@ const Temp: React.FC = () => {
         return () => {
             window.removeEventListener("resize", fn);
         };
-    }, []);
+    }, [active]);
 
     /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
