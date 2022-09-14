@@ -59,15 +59,14 @@ const Temp: React.FC<TempProps> = ({ setList, list, setSelectOption }) => {
     const content = (
         <div className="options_items">
             {comms.config.options?.[1].map((item) => {
+                const isActive = list.some((option) => option.code === item.code);
                 return (
                     <div
                         key={item.code}
-                        className={`item${
-                            list.some((option) => option.code === item.code) ? " active" : ""
-                        }`}
+                        className={`item${isActive ? " active" : ""}`}
                         onClick={() => handleClick(item)}
                     >
-                        <ItemBg />
+                        <ItemBg active={isActive} />
                         <span
                             className="itemContent"
                             dangerouslySetInnerHTML={{

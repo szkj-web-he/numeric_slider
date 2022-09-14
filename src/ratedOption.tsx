@@ -91,7 +91,7 @@ const Temp: React.FC<TempProps> = ({
         if (top) {
             timer = window.setTimeout(() => {
                 setShow(false);
-            }, 100);
+            }, 50);
         } else {
             setShow(true);
         }
@@ -307,7 +307,7 @@ const Temp: React.FC<TempProps> = ({
                         handleFocused(false);
                     }}
                 >
-                    <ItemBg />
+                    <ItemBg active={active} />
                     <span
                         className="itemContent"
                         dangerouslySetInnerHTML={{
