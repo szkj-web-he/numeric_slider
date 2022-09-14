@@ -12,6 +12,8 @@ import Icon from "./icon";
 import { Point, ScoreOption, ScoreRange } from "./type";
 import { getScrollValue } from "./unit";
 import { useHashId } from "./useHashId";
+import ItemBg from "./item";
+import join from "./Image/line.png";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -83,6 +85,7 @@ const Temp: React.FC<TempProps> = ({
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
+
     useEffect(() => {
         let timer: null | number = null;
         if (top) {
@@ -170,16 +173,24 @@ const Temp: React.FC<TempProps> = ({
             document.body.append(styleRef.current);
         };
         fn();
-    }, [id, leftValue]);
+        const timer = window.setTimeout(fn, 110);
+        return () => {
+            window.clearTimeout(timer);
+        };
+    }, [id, leftValue, scoreValue]);
 
     useEffect(() => {
         setTop(() => {
             const sameScore = elder.filter((item) => item.value === scoreValue);
 
             let height = 0;
-            const margin = 5;
+            const margin = 4;
+
             for (let i = 0; i < sameScore.length; i++) {
                 const el = sibling[sameScore[i].code];
+                if (i === 0) {
+                    height += 44.21 + 20 + 7;
+                }
                 height += el?.offsetHeight ? el.offsetHeight + margin : 0;
             }
             return height;
@@ -270,15 +281,15 @@ const Temp: React.FC<TempProps> = ({
         _style.zIndex = 99;
     }
     return (
-        <div className="ratedOption_items" style={_style} ref={getEl}>
+        <div className="ratedOption_items" style={_style}>
             <div className="ratedOption_pointer" ref={point} />
             {show ? (
                 <>
                     <div className="ratedOption_score">{scoreValue}分</div>
-                    <Icon className="ratedOption_icon" />
+                    <Icon />
                 </>
             ) : (
-                <></>
+                <img src={join} className={`ratedOption_joinIcon`} alt="" />
             )}
             <div className="ratedOption_itemsContainer" ref={ref}>
                 <Drag
@@ -288,6 +299,7 @@ const Temp: React.FC<TempProps> = ({
                     handleDragStart={handleDragStart}
                     handleDragMove={handleDragMove}
                     tabIndex={-1}
+                    ref={(el) => getEl(el)}
                     onFocus={() => {
                         handleFocused(true);
                     }}
@@ -295,8 +307,9 @@ const Temp: React.FC<TempProps> = ({
                         handleFocused(false);
                     }}
                 >
+                    <ItemBg />
                     <span
-                        className="ratedOption_container"
+                        className="itemContent"
                         dangerouslySetInnerHTML={{
                             __html: content,
                         }}

@@ -7,12 +7,13 @@
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
 import React from "react";
+import topLine from "./Image/join.png";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
-const Temp: React.FC<React.SVGAttributes<SVGSVGElement>> = ({ ...props }) => {
+const Temp: React.FC<React.ImgHTMLAttributes<HTMLImageElement>> = ({ className, ...props }) => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
@@ -23,27 +24,12 @@ const Temp: React.FC<React.SVGAttributes<SVGSVGElement>> = ({ ...props }) => {
     /************* This section will include this component general function *************/
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
-        <svg
-            width="14"
-            height="14"
-            viewBox="0 0 14 14"
-            xmlns="http://www.w3.org/2000/svg"
+        <img
+            src={topLine}
+            className={`option_topLineIcon${className ? ` ${className}` : ""}`}
+            alt=""
             {...props}
-        >
-            <g clipPath="url(#clip0_6502_15317)">
-                <path
-                    d="M13.3301 8.39917C13.2104 9.00081 12.9332 9.53661 12.5917 10.0803C12.4734 10.2686 12.3434 10.4633 12.2103 10.6628C11.9722 11.0196 11.7238 11.3917 11.5139 11.7698C11.1439 12.4361 10.9341 12.984 10.9311 13.5601C10.9288 14.0079 11.0517 14.4465 11.2755 14.944L2.71195 14.944C2.94163 14.4475 3.06827 14.0094 3.06827 13.5617C3.06827 12.9845 2.85792 12.4359 2.48806 11.7698C2.24538 11.3327 1.97943 10.9342 1.73373 10.566C1.60941 10.3797 1.49027 10.2012 1.38195 10.0293C1.05094 9.50426 0.791693 9.00175 0.671834 8.39917C0.422838 7.14739 0.550632 5.84988 1.03905 4.67072C1.52748 3.49156 2.35459 2.48372 3.4158 1.77464C4.47702 1.06556 5.72467 0.687089 7.00098 0.687089C8.27729 0.687089 9.52493 1.06556 10.5861 1.77464C11.6474 2.48372 12.4745 3.49156 12.9629 4.67072C13.4513 5.84987 13.5791 7.14738 13.3301 8.39917Z"
-                    fill="currentColor"
-                    stroke="#3CBBC7"
-                    strokeWidth="0.6"
-                />
-            </g>
-            <defs>
-                <clipPath id="clip0_6502_15317">
-                    <rect width="14" height="13.2" transform="translate(0 0.387207)" />
-                </clipPath>
-            </defs>
-        </svg>
+        />
     );
 };
 /* <------------------------------------ **** FUNCTION COMPONENT END **** ------------------------------------ */

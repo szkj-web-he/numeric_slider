@@ -69,6 +69,7 @@ const Temp: React.FC<TempProps> = ({ setList, list, setSelectOption }) => {
                     >
                         <ItemBg />
                         <span
+                            className="itemContent"
                             dangerouslySetInnerHTML={{
                                 __html: item.content,
                             }}
