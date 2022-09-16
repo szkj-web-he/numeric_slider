@@ -18,7 +18,7 @@ interface TempProps {
 
     scoreRange?: ScoreRange[];
 
-    staticScoreOptions: ScoreOption[];
+    staticScoreOptions: React.MutableRefObject<ScoreOption[]>;
 
     /**
      *当分数发生变化的时候
@@ -151,13 +151,13 @@ const Temp: React.FC<TempProps> = ({
                 }
             }
             if (rangeRef.current[n + status]) {
-                for (let i = 0; i < staticScoreOptions.length; i++) {
-                    const option = staticScoreOptions[i];
+                for (let i = 0; i < staticScoreOptions.current.length; i++) {
+                    const option = staticScoreOptions.current[i];
                     if (option.code === selectOptionRef.current.code) {
                         option.value = rangeRef.current[n + status].value;
                     }
                 }
-                changeFn.current(deepCloneData(staticScoreOptions));
+                changeFn.current(deepCloneData(staticScoreOptions.current));
             }
         };
 
@@ -210,13 +210,13 @@ const Temp: React.FC<TempProps> = ({
     /************* This section will include this component general function *************/
 
     const changeItemValue = (item: OptionProps, score: number) => {
-        for (let i = 0; i < staticScoreOptions.length; i++) {
-            const option = staticScoreOptions[i];
+        for (let i = 0; i < staticScoreOptions.current.length; i++) {
+            const option = staticScoreOptions.current[i];
             if (option.code === item.code) {
                 option.value = score;
             }
         }
-        onChange(deepCloneData(staticScoreOptions));
+        onChange(deepCloneData(staticScoreOptions.current));
     };
 
     const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -257,7 +257,7 @@ const Temp: React.FC<TempProps> = ({
         >
             <div className={`dragHotspot`} ref={ref}>
                 <div
-                    className={`sliderTrunk${scoreOptions.length ? " active" : ""}`}
+                    className="sliderTrunk"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={handleClick}
                 />

@@ -3,7 +3,6 @@ import "./font.scss";
 import "./style.scss";
 
 import { ConfigYML, PluginComms } from "@possie-engine/dr-plugin-sdk";
-import JumpWrap from "./Component/JumpWrap";
 import Header from "./header";
 import MainContent from "./main";
 
@@ -13,7 +12,7 @@ export const comms = new PluginComms({
     config: {
         question?: string;
         instruction?: string;
-        options?: Array<Array<{ code: string; content: string }>>;
+        options?: Array<{ code: string; content: string }>;
         totalScore?: number;
         optionsInstruction?: string;
     };
@@ -36,10 +35,8 @@ const Main: React.FC = () => {
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
         <div className="wrapper">
-            <JumpWrap>
-                <Header />
-                <MainContent />
-            </JumpWrap>
+            <Header />
+            <MainContent />
         </div>
     );
 };

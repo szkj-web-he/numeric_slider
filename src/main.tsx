@@ -17,47 +17,28 @@ import { useRef } from "react";
 import { useLayoutEffect } from "react";
 import { deepCloneData } from "./unit";
 import { useEffect } from "react";
-import { Group } from "./Component/Group";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
-
-/* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
-/* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
 const Temp: React.FC = () => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
-    const [scoreOptions, setScoreOptions] = useState<Record<string, Array<ScoreOption>>>();
+    const [scoreOptions, setScoreOptions] = useState<Array<ScoreOption>>([]);
 
     const rulerData = useRuler();
 
-    const [selectOption, setSelectOption] = useState<{
-        row: OptionProps;
-        col: OptionProps;
-    }>();
+    const [selectOption, setSelectOption] = useState<OptionProps>();
 
-    const scoreOptionsRef = useRef<Record<string, Array<ScoreOption>>>();
+    const scoreOptionsRef = useRef<Array<ScoreOption>>([]);
 
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
 
     useEffect(() => {
-        const data: Record<string, Record<string, number | null>> = {};
-        const rows = comms.config.options?.[0] ?? [];
-        const cols = comms.config.options?.[1] ?? [];
-
-        for (let i = 0; i < rows.length; i++) {
-            const row = rows[i];
-            const selectOptions = scoreOptions?.[row.code] ?? [];
-            const colData: Record<string, number | null> = {};
-
-            for (let j = 0; j < cols.length; j++) {
-                const col = cols[j];
-                const valData = selectOptions.find((item) => item.code === col.code);
-                colData[col.code] = valData?.value ?? null;
-            }
-            data[row.code] = colData;
+        const data: Record<string, number> = {};
+        for (let i = 0; i < scoreOptions.length; i++) {
+            data[scoreOptions[i].code] = scoreOptions[i].value;
         }
         comms.state = data;
     }, [scoreOptions]);
@@ -73,70 +54,26 @@ const Temp: React.FC = () => {
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
         <div className="main">
-            {comms.config.options?.[0].map((item, n) => {
-                return (
-                    <Group key={item.code} index={n}>
-                        <div
-                            className="group_top"
-                            dangerouslySetInnerHTML={{
-                                __html: item.content,
-                            }}
-                        />
-                        <Options
-                            setList={(res) => {
-                                scoreOptionsRef.current = Object.assign(
-                                    {},
-                                    scoreOptionsRef.current,
-                                    { [item.code]: deepCloneData(res) },
-                                );
-                                setScoreOptions(deepCloneData(scoreOptionsRef.current));
-                            }}
-                            setSelectOption={(res) => {
-                                setSelectOption({
-                                    row: deepCloneData(item),
-                                    col: deepCloneData(res),
-                                });
-                            }}
-                            list={scoreOptions?.[item.code] ?? []}
-                        />
-                        <div className="hr" />
-                        <div className="place">
-                            <div className="placeTips">{comms.config.optionsInstruction}</div>
-                            <Ruler ruler={rulerData?.[0]} />
-                            <DragHotspot
-                                scoreRange={rulerData?.[1]}
-                                scoreOptions={scoreOptions?.[item.code] ?? []}
-                                selectOption={
-                                    selectOption?.row.code === item.code
-                                        ? selectOption.col
-                                        : undefined
-                                }
-                                staticScoreOptions={deepCloneData(
-                                    scoreOptionsRef.current?.[item.code] ?? [],
-                                )}
-                                setSelectOption={(res) => {
-                                    if (res) {
-                                        setSelectOption({
-                                            row: deepCloneData(item),
-                                            col: deepCloneData(res),
-                                        });
-                                    } else {
-                                        setSelectOption(undefined);
-                                    }
-                                }}
-                                onChange={(res) => {
-                                    scoreOptionsRef.current = Object.assign(
-                                        {},
-                                        scoreOptionsRef.current,
-                                        { [item.code]: deepCloneData(res) },
-                                    );
-                                    setScoreOptions(deepCloneData(scoreOptionsRef.current));
-                                }}
-                            />
-                        </div>
-                    </Group>
-                );
-            })}
+            <Options
+                setList={setScoreOptions}
+                setSelectOption={setSelectOption}
+                list={scoreOptions}
+            />
+            <div className="hr" />
+            <div className="place">
+                <div className="placeTips">{comms.config.optionsInstruction}</div>
+                <Ruler ruler={rulerData?.[0]} />
+                <DragHotspot
+                    scoreRange={rulerData?.[1]}
+                    scoreOptions={scoreOptions}
+                    selectOption={selectOption}
+                    staticScoreOptions={scoreOptionsRef}
+                    setSelectOption={setSelectOption}
+                    onChange={(res) => {
+                        setScoreOptions(deepCloneData(res));
+                    }}
+                />
+            </div>
         </div>
     );
 };
