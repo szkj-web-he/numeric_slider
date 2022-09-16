@@ -7,13 +7,15 @@
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
 import React from "react";
-import topLine from "./Image/join.png";
+import barActive from "./Image/icon_active.png";
+import bar from "./Image/icon_bar.png";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
+
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
-const Temp: React.FC<React.ImgHTMLAttributes<HTMLImageElement>> = ({ className, ...props }) => {
+const Temp: React.FC = () => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
@@ -24,12 +26,10 @@ const Temp: React.FC<React.ImgHTMLAttributes<HTMLImageElement>> = ({ className, 
     /************* This section will include this component general function *************/
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
-        <img
-            src={topLine}
-            className={`option_topLineIcon${className ? ` ${className}` : ""}`}
-            alt=""
-            {...props}
-        />
+        <div className="slider_bar">
+            <img src={bar} alt="" className="slider_barIcon" />
+            <img src={barActive} alt="" className="slider_activeBarIcon" />
+        </div>
     );
 };
 /* <------------------------------------ **** FUNCTION COMPONENT END **** ------------------------------------ */

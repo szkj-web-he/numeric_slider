@@ -257,7 +257,7 @@ const Temp: React.FC<TempProps> = ({
         >
             <div className={`dragHotspot`} ref={ref}>
                 <div
-                    className="sliderTrunk"
+                    className={`sliderTrunk${scoreOptions.length ? " active" : ""}`}
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={handleClick}
                 />
