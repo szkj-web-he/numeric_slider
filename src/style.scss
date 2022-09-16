@@ -21,22 +21,6 @@ body {
 
 .wrapper {
     background-color: #fff;
-    background-image: url("./Image/bg.png");
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: cover;
-    position: relative;
-    &::after {
-        content: "";
-        top: 0;
-        left: 0;
-        opacity: 0.2;
-        background-color: #fff;
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        pointer-events: none;
-    }
 }
 
 .question {
@@ -49,17 +33,17 @@ body {
 }
 
 .questionContent {
-    color: #884718;
+    color: #212121;
     font-family: $fontFamily;
     font-style: normal;
     font-size: 20px;
     line-height: 30px;
-    font-weight: 400;
+    font-weight: 500;
     letter-spacing: 0.2px;
 }
 
 .questionDes {
-    color: #708c74;
+    color: #757575;
     font-family: $fontFamily;
     font-style: normal;
     font-weight: 400;
@@ -81,7 +65,6 @@ body {
 
 .options {
     width: 100%;
-
     margin-top: 32px;
 }
 
@@ -90,18 +73,18 @@ body {
     font-style: normal;
     font-weight: 400;
     font-size: 14px;
-    line-height: 21px;
+    line-height: 20px;
     @include Padding();
     display: flex;
     align-items: center;
     letter-spacing: 0.2px;
 
-    color: #aa931c;
+    color: #bdbdbd;
 }
 
 .options_totalVal {
     padding: 0 5px;
-    color: #80aea2;
+    color: #22a6b3;
 }
 
 .options_scrollBody {
@@ -119,7 +102,7 @@ body {
 }
 
 .item {
-    padding: 8.5px 17px;
+    padding: 8px 12px;
     font-family: $fontFamily;
     font-style: normal;
     font-weight: 400;
@@ -132,12 +115,16 @@ body {
     flex-flow: row nowrap;
     letter-spacing: 0.2px;
     flex: 0 0 auto;
-    color: #0c596f;
+    color: #4d4d4d;
     margin: 8px 16px 8px 0;
     cursor: pointer;
+    background: #ffffff;
+    border: 1px solid #ebebeb;
+    border-radius: 6px;
     position: relative;
     &.active {
-        color: #fffdc5;
+        background: #f7feff;
+        color: #22a6b3;
     }
     .itemContent {
         position: relative;
@@ -146,14 +133,10 @@ body {
 }
 
 .hr {
-    width: calc(100% - 22.88px - 16.13px);
-    height: 19.9px;
-    background-image: url("./Image/hr.png");
-    background-color: transparent;
-    background-position: top left;
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    margin: 31px auto 21px auto;
+    width: calc(100% - 32px);
+    height: 1px;
+    background-color: #ebebeb;
+    margin: 40px auto 32px auto;
 }
 
 .placeTips {
@@ -163,7 +146,7 @@ body {
     font-size: 16px;
     line-height: 24px;
     letter-spacing: 0.2px;
-    color: #884718;
+    color: #4d4d4d;
     @include Padding();
     margin-bottom: 12.5px;
 }
@@ -182,7 +165,7 @@ body {
         position: absolute;
         top: 0;
         left: 0;
-        background-color: #aa931c;
+        background-color: #bdbdbd;
         z-index: 2;
         border-radius: 1px;
     }
@@ -196,7 +179,7 @@ body {
         left: -0.5px;
         top: 0;
         width: 1px;
-        background-color: #aa931c;
+        background-color: #bdbdbd;
         border-radius: 1px;
         position: absolute;
         height: 100%;
@@ -223,10 +206,10 @@ body {
     font-style: normal;
     top: 0;
     font-weight: 400;
-    font-size: 14px;
-    line-height: 20px;
-    letter-spacing: 0.25px;
-    color: #aa931c;
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 0.4px;
+    color: #757575;
     transform: translateX(-50%);
     padding-top: 12px;
     position: absolute;
@@ -245,18 +228,15 @@ body {
 }
 
 .sliderTrunk {
-    height: 14px;
+    height: 6px;
     cursor: pointer;
-    background-image: url("./Image/rope.png");
-    background-repeat: repeat-x;
-    background-position: center left;
-    background-color: transparent;
-    background-size: auto 100%;
+    background-color: #f5f5f5;
+    border-radius: 10px;
 }
 
 .ratedOption_items {
     z-index: 2;
-    top: -20px;
+    top: -24px;
     left: 0;
     position: absolute;
     pointer-events: none;
@@ -268,7 +248,7 @@ body {
 }
 
 .ratedOption_itemsContainer {
-    margin-top: -10px;
+    margin-top: -2px;
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
@@ -277,7 +257,7 @@ body {
 }
 
 .ratedOption_item {
-    padding: 8.5px 17px;
+    padding: 6px 14px;
     box-sizing: content-box;
     font-family: $fontFamily;
     font-style: normal;
@@ -290,15 +270,19 @@ body {
     text-align: center;
     transform: translateX(-50%);
     letter-spacing: 0.2px;
-    color: #0c596f;
+    color: #4d4d4d;
     word-wrap: break-word;
     outline: none;
     word-break: break-word;
     white-space: pre-wrap;
     cursor: pointer;
+    border: 0.6px solid #22a6b3;
     flex-flow: row wrap;
+    background: #ffffff;
+    border-radius: 6px;
     &.active {
-        color: #fffdc5;
+        color: #22a6b3;
+        background: #f7feff;
     }
     .itemContent {
         position: relative;
@@ -313,9 +297,9 @@ body {
     font-size: 12px;
     line-height: 18px;
     letter-spacing: 0.5px;
-    color: #0c596f;
+    color: #22a6b3;
     transform: translateX(-50%);
-    margin-bottom: 7px;
+    margin-bottom: 6px;
     white-space: nowrap;
 }
 
@@ -330,48 +314,6 @@ body {
     left: 0;
     width: 0;
     height: 100%;
-}
-
-.itemBg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    pointer-events: none;
-    z-index: 0;
-}
-
-.itemBg_left {
-    position: absolute;
-    top: -1.38px;
-    left: -6px;
-    pointer-events: none;
-    z-index: 1;
-    width: 23.52px;
-    height: 16.68px;
-    object-fit: cover;
-    object-position: center center;
-}
-
-.itemBg_right {
-    position: absolute;
-    bottom: -0.42px;
-    right: -9px;
-    pointer-events: none;
-    z-index: 1;
-    width: 23px;
-    height: 11.7px;
-    object-fit: cover;
-    object-position: center center;
-}
-
-.option_topLineIcon {
-    width: 23.7px;
-    height: 44.21px;
-    object-fit: cover;
-    object-position: center center;
-    z-index: 3;
-    position: relative;
-    transform: translateX(-50%);
 }
 
 .ratedOption_joinIcon {
@@ -392,8 +334,15 @@ body {
     display: flex;
     align-items: center;
     letter-spacing: 0.2px;
-    color: #884718;
+    color: #4d4d4d;
     @include Padding();
     margin-bottom: 24px;
     margin-top: 32px;
+}
+
+.ratedOption_icon {
+    color: #fff;
+    position: relative;
+    z-index: 1;
+    transform: translateX(-50%);
 }

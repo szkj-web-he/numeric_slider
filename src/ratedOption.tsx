@@ -12,8 +12,6 @@ import Icon from "./icon";
 import { Point, ScoreOption, ScoreRange } from "./type";
 import { getScrollValue } from "./unit";
 import { useHashId } from "./useHashId";
-import ItemBg from "./item";
-import join from "./Image/line.png";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -189,7 +187,7 @@ const Temp: React.FC<TempProps> = ({
             for (let i = 0; i < sameScore.length; i++) {
                 const el = sibling[sameScore[i].code];
                 if (i === 0) {
-                    height += 44.21 + 20 + 7;
+                    height += 18 + 6 + 12;
                 }
                 height += el?.offsetHeight ? el.offsetHeight + margin : 0;
             }
@@ -286,10 +284,10 @@ const Temp: React.FC<TempProps> = ({
             {show ? (
                 <>
                     <div className="ratedOption_score">{scoreValue}</div>
-                    <Icon />
+                    <Icon className="ratedOption_icon" />
                 </>
             ) : (
-                <img src={join} className={`ratedOption_joinIcon`} alt="" />
+                <></>
             )}
             <div className="ratedOption_itemsContainer" ref={ref}>
                 <Drag
@@ -307,7 +305,6 @@ const Temp: React.FC<TempProps> = ({
                         handleFocused(false);
                     }}
                 >
-                    <ItemBg active={active} />
                     <span
                         className="itemContent"
                         dangerouslySetInnerHTML={{
