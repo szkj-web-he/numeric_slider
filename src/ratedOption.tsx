@@ -285,7 +285,7 @@ const Temp: React.FC<TempProps> = ({
             <div className="ratedOption_pointer" ref={point} />
             {show ? (
                 <>
-                    <div className="ratedOption_score">{scoreValue}分</div>
+                    <div className="ratedOption_score">{scoreValue}</div>
                     <Icon />
                 </>
             ) : (
