@@ -170,6 +170,10 @@ const Temp: React.FC<TempProps> = ({
             document.body.append(styleRef.current);
         };
         fn();
+        const timer = window.setTimeout(fn, 110);
+        return () => {
+            window.clearTimeout(timer);
+        };
     }, [id, leftValue]);
 
     useEffect(() => {
@@ -180,6 +184,9 @@ const Temp: React.FC<TempProps> = ({
             const margin = 5;
             for (let i = 0; i < sameScore.length; i++) {
                 const el = sibling[sameScore[i].code];
+                if (i === 0) {
+                    height += 18 + 12 + 6;
+                }
                 height += el?.offsetHeight ? el.offsetHeight + margin : 0;
             }
             return height;
@@ -270,11 +277,11 @@ const Temp: React.FC<TempProps> = ({
         _style.zIndex = 99;
     }
     return (
-        <div className="ratedOption_items" style={_style} ref={getEl}>
+        <div className="ratedOption_items" style={_style}>
             <div className="ratedOption_pointer" ref={point} />
             {show ? (
                 <>
-                    <div className="ratedOption_score">{scoreValue}分</div>
+                    <div className="ratedOption_score">{scoreValue}</div>
                     <Icon className="ratedOption_icon" />
                 </>
             ) : (
@@ -288,6 +295,7 @@ const Temp: React.FC<TempProps> = ({
                     handleDragStart={handleDragStart}
                     handleDragMove={handleDragMove}
                     tabIndex={-1}
+                    ref={getEl}
                     onFocus={() => {
                         handleFocused(true);
                     }}
