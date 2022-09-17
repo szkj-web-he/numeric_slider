@@ -11,7 +11,7 @@ import { comms } from ".";
 import { ScrollComponent } from "./Scroll";
 import { OptionProps, ScoreOption } from "./type";
 import { deepCloneData } from "./unit";
-import ItemBg from "./item";
+
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -66,7 +66,6 @@ const Temp: React.FC<TempProps> = ({ setList, list, setSelectOption }) => {
                         className={`item${isActive ? " active" : ""}`}
                         onClick={() => handleClick(item)}
                     >
-                        <ItemBg active={isActive} />
                         <span
                             className="itemContent"
                             dangerouslySetInnerHTML={{

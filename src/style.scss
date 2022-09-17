@@ -49,7 +49,7 @@ body {
 }
 
 .questionContent {
-    color: #31456a;
+    color: black;
     font-family: $fontFamily;
     font-style: normal;
     font-size: 20px;
@@ -59,7 +59,7 @@ body {
 }
 
 .questionDes {
-    color: #7788a3;
+    color: #5c757f;
     font-family: $fontFamily;
     font-style: normal;
     font-weight: 400;
@@ -96,12 +96,12 @@ body {
     align-items: center;
     letter-spacing: 0.2px;
 
-    color: #7788a3;
+    color: #fff;
 }
 
 .options_totalVal {
     padding: 0 5px;
-    color: #02b2c7;
+    color: #f5ee35;
 }
 
 .options_scrollBody {
@@ -119,14 +119,45 @@ body {
 }
 
 @mixin Btn {
-    padding: 10px 12px;
+    padding: 8px 16.5px 10px 16.5px;
+    box-sizing: border-box;
     font-family: $fontFamily;
     font-style: normal;
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
-    color: #00adc5;
+    color: #fff;
+    text-shadow: 1px 0px 0px black, -1px 0px 0px black, 0px -1px 0px black, 0px 1px 0px black;
     letter-spacing: 0.2px;
+    &::before {
+        content: "";
+        position: absolute;
+        top: 4px;
+        left: 12px;
+        width: calc(100% - 24px);
+        height: calc(100% - 4px - 6px);
+        background-color: #556e79;
+        z-index: 1;
+    }
+    &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        border-width: 6px 14px 8px 14px;
+        border-style: solid;
+        border-color: transparent;
+        border-image: url("./Image/btn_itemIcon.png") 21 55 32 55;
+        z-index: 2;
+    }
+    &.active {
+        &::after {
+            border-image: url("./Image/btn_itemActive.png") 21 55 32 55;
+        }
+    }
     .itemContent {
         position: relative;
         z-index: 2;
@@ -146,15 +177,77 @@ body {
     position: relative;
 }
 
+@mixin RowFlex {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-flow: row nowrap;
+}
+
 .hr {
     width: calc(100% - 22.88px - 16.13px);
-    height: 20px;
-    background-image: url("./Image/hr.png");
-    background-color: transparent;
-    background-position: top left;
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
+    height: 15px;
+
     margin: 31px auto 21px auto;
+    @include RowFlex();
+    padding: 0 5px;
+    position: relative;
+    box-sizing: border-box;
+
+    &::before {
+        content: "";
+        position: absolute;
+        left: 5px;
+        top: 0;
+        width: calc(100% - 10px);
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.6);
+        z-index: 0;
+    }
+    &::after {
+        content: "";
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        border-width: 1px 5px;
+        border-style: solid;
+        border-color: transparent;
+        border-image: url("./Image/hr.png") 4 20;
+        position: absolute;
+        z-index: 1;
+        box-sizing: border-box;
+    }
+}
+
+.hr_active,
+.hr_none {
+    object-fit: cover;
+    width: 10px;
+    height: 10px;
+    object-position: center center;
+    position: relative;
+    z-index: 3;
+}
+
+.hr_left {
+    @include RowFlex();
+    flex: 0 0 auto;
+    .hr_active {
+        margin-right: 5px;
+    }
+}
+.hr_center {
+    @include RowFlex();
+    flex: 1 1 auto;
+    justify-content: space-between;
+}
+.hr_right {
+    @include RowFlex();
+    flex: 0 0 auto;
+    .hr_active {
+        margin-left: 5px;
+    }
 }
 
 .placeTips {
@@ -164,7 +257,7 @@ body {
     font-size: 16px;
     line-height: 24px;
     letter-spacing: 0.2px;
-    color: #7788a3;
+    color: black;
     @include Padding();
     margin-bottom: 12.5px;
 }
@@ -179,11 +272,11 @@ body {
     &::before {
         content: "";
         width: 100%;
-        height: 1px;
+        height: 2px;
         position: absolute;
         top: 0;
         left: 0;
-        background-color: #7788a3;
+        background-color: black;
         z-index: 2;
         border-radius: 1px;
     }
@@ -197,7 +290,7 @@ body {
         left: -0.5px;
         top: 0;
         width: 1px;
-        background-color: #7788a3;
+        background-color: black;
         border-radius: 1px;
         position: absolute;
         height: 100%;
@@ -227,7 +320,7 @@ body {
     font-size: 12px;
     line-height: 16px;
     letter-spacing: 0.4px;
-    color: #7788a3;
+    color: black;
     transform: translateX(-50%);
     padding-top: 12px;
     position: absolute;
@@ -246,45 +339,20 @@ body {
 }
 
 .sliderTrunk {
-    height: 13px;
+    height: 21.19px;
     cursor: pointer;
-
-    background: linear-gradient(8.37deg, #ffffff -30.86%, #ecf1f7 -10.72%, #cfdceb 112.31%);
-    box-shadow: inset -4px -4px 7px rgba(255, 255, 255, 0.7),
-        inset 4px 4px 6px rgba(18, 46, 101, 0.15);
-    border-radius: 31px;
     position: relative;
-    &.active {
-        &::before {
-            content: "";
-            width: calc(100% - 6px);
-            height: calc(100% - 2px);
-            position: absolute;
-            top: 1px;
-            left: 3px;
-            background: linear-gradient(89.72deg, #0ed2d2 -4.95%, #008295 578.66%);
-            border-radius: 26px;
-        }
-        &::after {
-            content: "";
-            width: calc(100% - 6px);
-            height: calc(100% - 2px);
-            position: absolute;
-            top: 1px;
-            left: 3px;
-            border-radius: 26px;
-            background-image: url("./Image/trunk.png");
-            background-position: top left;
-            background-size: auto 100%;
-            background-repeat: repeat-x;
-            background-color: transparent;
-        }
-    }
+    background-image: url("./Image/trunk.png");
+    background-repeat: repeat-x;
+    width: 100%;
+    background-color: transparent;
+    background-position: top left;
+    background-size: auto 100%;
 }
 
 .ratedOption_items {
     z-index: 2;
-    top: -26px;
+    top: -18px;
     left: 0;
     position: absolute;
     pointer-events: none;
@@ -296,51 +364,20 @@ body {
 }
 
 .ratedOption_itemsContainer {
-    margin-top: -3px;
+    margin-top: -7px;
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
     flex-flow: column nowrap;
     pointer-events: auto;
     position: relative;
-    z-index: 3;
+    z-index: 0;
 }
 
 .ratedOption_item {
-    font-family: $fontFamily;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 20px;
-    color: #00adc5;
-    letter-spacing: 0.2px;
-    padding: 7px 14px;
-    background: #e3edf7;
-    box-shadow: 5px 2px 16px rgba(136, 165, 191, 0.78), inset 0px -1px 1px rgba(85, 102, 123, 0.4);
-    border-radius: 6px;
+    @include Btn();
     position: relative;
-    &::before {
-        content: "";
-        position: absolute;
-        top: 3px;
-        left: 3px;
-        width: calc(100% - 6px);
-        height: calc(100% - 6px);
-        transform: all 0.1s linear;
-    }
-    &.active {
-        &::before {
-            background: #e3edf7;
-            box-shadow: inset -1.7027px -1.7027px 3.97297px #ffffff,
-                inset 1.7027px 1.7027px 3.97297px rgba(136, 165, 191, 0.48);
-            border-radius: 6.66667px;
-        }
-    }
-    .itemContent {
-        position: relative;
-        z-index: 2;
-    }
-    box-sizing: content-box;
+
     display: flex;
     align-items: center;
     justify-content: center;
@@ -351,6 +388,7 @@ body {
     word-break: break-word;
     white-space: pre-wrap;
     cursor: pointer;
+    z-index: 0;
     flex-flow: row wrap;
 }
 
@@ -361,7 +399,8 @@ body {
     font-size: 12px;
     line-height: 18px;
     letter-spacing: 0.5px;
-    color: #01aec5;
+    color: #f9fc4b;
+    text-shadow: 1px 0px 0px black, -1px 0px 0px black, 0px -1px 0px black, 0px 1px 0px black;
     transform: translateX(-50%);
     margin-bottom: 7px;
     white-space: nowrap;
@@ -469,28 +508,12 @@ body {
     }
 }
 
-.slider_bar {
-    position: relative;
-    transform: translateX(-50%);
-    z-index: 1;
-}
-
 .slider_barIcon {
     object-fit: cover;
     object-position: center center;
-    height: 16px;
-    width: auto;
+    height: auto;
+    width: 15px;
     position: relative;
-    z-index: 1;
-}
-
-.slider_activeBarIcon {
-    position: absolute;
-    object-fit: cover;
-    object-position: center center;
-    height: 53px;
-    width: auto;
-    left: -12px;
-    top: -15px;
-    z-index: 0;
+    z-index: 2;
+    transform: translateX(-50%);
 }

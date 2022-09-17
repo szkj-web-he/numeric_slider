@@ -7,7 +7,6 @@
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
 import React from "react";
-import barActive from "./Image/icon_active.png";
 import bar from "./Image/icon_bar.png";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
@@ -25,12 +24,7 @@ const Temp: React.FC = () => {
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
     /************* This section will include this component general function *************/
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
-    return (
-        <div className="slider_bar">
-            <img src={bar} alt="" className="slider_barIcon" />
-            <img src={barActive} alt="" className="slider_activeBarIcon" />
-        </div>
-    );
+    return <img src={bar} alt="" className="slider_barIcon" />;
 };
 /* <------------------------------------ **** FUNCTION COMPONENT END **** ------------------------------------ */
 export default Temp;
