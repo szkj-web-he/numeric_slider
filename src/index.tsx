@@ -5,6 +5,7 @@ import "./style.scss";
 import { ConfigYML, PluginComms } from "@possie-engine/dr-plugin-sdk";
 import Header from "./header";
 import MainContent from "./main";
+import { ScrollComponent } from "./Scroll";
 
 export const comms = new PluginComms({
     defaultConfig: new ConfigYML(),
@@ -35,8 +36,10 @@ const Main: React.FC = () => {
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
         <div className="wrapper">
-            <Header />
-            <MainContent />
+            <ScrollComponent>
+                <Header />
+                <MainContent />
+            </ScrollComponent>
         </div>
     );
 };
