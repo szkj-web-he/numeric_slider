@@ -33,11 +33,6 @@
     height: 44px;
     &::after {
         content: "";
-        background: #edf2f8;
-        box-shadow: -6.28571px -3.14286px 12.5714px rgba(255, 255, 255, 0.7),
-            4.71429px 3.14286px 18.8571px rgba(28, 74, 117, 0.36);
-        filter: blur(1.57143px);
-        border-radius: 33px;
         position: absolute;
         top: 0;
         left: 0;
@@ -47,15 +42,6 @@
     }
 
     &.active {
-        &::after {
-            background: radial-gradient(
-                    315.18% 315.18% at -124.11% -101.79%,
-                    #b9cce2 11.1%,
-                    #ffffff 85.21%
-                )
-                #e3edf7;
-        }
-
         .jumpBtn_btnIcon {
             opacity: 0;
         }

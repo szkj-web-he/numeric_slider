@@ -187,7 +187,7 @@ const Temp: React.FC<TempProps> = ({
             for (let i = 0; i < sameScore.length; i++) {
                 const el = sibling[sameScore[i].code];
                 if (i === 0) {
-                    height += 19 + 18 + 7;
+                    height += 42 + 18 + 7;
                 }
                 height += el?.offsetHeight ? el.offsetHeight + margin : 0;
             }

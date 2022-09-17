@@ -18,6 +18,7 @@ import { useLayoutEffect } from "react";
 import { deepCloneData } from "./unit";
 import { useEffect } from "react";
 import { Group } from "./Component/Group";
+import Hr from "./hr";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -99,7 +100,7 @@ const Temp: React.FC = () => {
                             }}
                             list={scoreOptions?.[item.code] ?? []}
                         />
-                        <div className="hr" />
+                        <Hr />
                         <div className="place">
                             <div className="placeTips">{comms.config.optionsInstruction}</div>
                             <Ruler ruler={rulerData?.[0]} />
