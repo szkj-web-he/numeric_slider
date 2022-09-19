@@ -36,7 +36,11 @@ const Main: React.FC = () => {
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
         <div className="wrapper">
-            <ScrollComponent>
+            <ScrollComponent
+                hidden={{
+                    x: true,
+                }}
+            >
                 <Header />
                 <MainContent />
             </ScrollComponent>
