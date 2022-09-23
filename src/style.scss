@@ -301,7 +301,7 @@ body {
     align-items: flex-start;
     justify-content: flex-start;
     flex-flow: column nowrap;
-    pointer-events: auto;
+    pointer-events: none;
     position: relative;
     z-index: 3;
 }
@@ -314,6 +314,7 @@ body {
     line-height: 20px;
     color: #00adc5;
     letter-spacing: 0.2px;
+    pointer-events: auto;
     padding: 7px 14px;
     background: #e3edf7;
     box-shadow: 5px 2px 16px rgba(136, 165, 191, 0.78), inset 0px -1px 1px rgba(85, 102, 123, 0.4);
