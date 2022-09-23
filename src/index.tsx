@@ -1,5 +1,4 @@
 import React from "react";
-import "./elementsFromPointPolyfill.ts";
 import "./font.scss";
 import "./style.scss";
 
