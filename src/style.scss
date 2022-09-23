@@ -253,7 +253,7 @@ body {
     align-items: flex-start;
     justify-content: flex-start;
     flex-flow: column nowrap;
-    pointer-events: auto;
+    pointer-events: none;
 }
 
 .ratedOption_item {
@@ -272,6 +272,7 @@ body {
     letter-spacing: 0.2px;
     color: #4d4d4d;
     word-wrap: break-word;
+    pointer-events: auto;
     outline: none;
     word-break: break-word;
     white-space: pre-wrap;
