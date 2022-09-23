@@ -272,7 +272,7 @@ body {
     align-items: flex-start;
     justify-content: flex-start;
     flex-flow: column nowrap;
-    pointer-events: auto;
+    pointer-events: none;
 }
 
 .ratedOption_item {
@@ -299,6 +299,7 @@ body {
     white-space: pre-wrap;
     cursor: pointer;
     flex-flow: row wrap;
+    pointer-events: auto;
     &.active {
         background-color: #f7feff;
         color: #22a6b3;
