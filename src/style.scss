@@ -369,7 +369,7 @@ body {
     align-items: flex-start;
     justify-content: flex-start;
     flex-flow: column nowrap;
-    pointer-events: auto;
+    pointer-events: none;
     position: relative;
     z-index: 0;
 }
@@ -377,7 +377,7 @@ body {
 .ratedOption_item {
     @include Btn();
     position: relative;
-
+    pointer-events: auto;
     display: flex;
     align-items: center;
     justify-content: center;
