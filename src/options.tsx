@@ -20,7 +20,7 @@ interface TempProps {
 
     list: ScoreOption[];
 
-    setSelectOption: (option: OptionProps) => void;
+    setSelectOption: (option?: OptionProps) => void;
 }
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
@@ -48,11 +48,12 @@ const Temp: React.FC<TempProps> = ({ setList, list, setSelectOption }) => {
 
         if (n >= 0) {
             arr.splice(n, 1);
+            setSelectOption();
         } else {
             arr.push({ ...item, value: 0 });
+            setSelectOption(deepCloneData(item));
         }
         setList([...arr]);
-        setSelectOption(deepCloneData(item));
     };
 
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
