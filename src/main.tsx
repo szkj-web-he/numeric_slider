@@ -92,10 +92,14 @@ const Temp: React.FC = () => {
                                 setScoreOptions(deepCloneData(scoreOptionsRef.current));
                             }}
                             setSelectOption={(res) => {
-                                setSelectOption({
-                                    row: deepCloneData(item),
-                                    col: deepCloneData(res),
-                                });
+                                setSelectOption(
+                                    res
+                                        ? {
+                                              row: deepCloneData(item),
+                                              col: deepCloneData(res),
+                                          }
+                                        : undefined,
+                                );
                             }}
                             list={scoreOptions?.[item.code] ?? []}
                         />
