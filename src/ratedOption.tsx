@@ -6,7 +6,7 @@
  */
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import React, { useEffect, useLayoutEffect, useRef, useState, useTransition } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Drag } from "./Drag";
 import Icon from "./icon";
 import { DragMoveProps, DragPramsProps, OptionProps, ScoreRange } from "./type";
@@ -65,8 +65,6 @@ const Temp: React.FC<TempProps> = ({
     const offsetX = useRef(0);
 
     const activeRef = useRef<HTMLDivElement | null>(null);
-
-    const [, transitionFn] = useTransition();
 
     const scoreChangeFn = useRef(handleScoreChange);
     const rangeRef = useRef(range);
@@ -181,46 +179,44 @@ const Temp: React.FC<TempProps> = ({
 
     useEffect(() => {
         const fn = () => {
-            transitionFn(() => {
-                let exactMatch = -1;
-                for (let i = 0; i < rangeRef.current.length; ) {
-                    const item = rangeRef.current[i];
-                    if (item.value === scoreValueRef.current) {
-                        i = rangeRef.current.length;
-                        exactMatch = item.x;
-                    } else {
-                        ++i;
-                    }
+            let exactMatch = -1;
+            for (let i = 0; i < rangeRef.current.length; ) {
+                const item = rangeRef.current[i];
+                if (item.value === scoreValueRef.current) {
+                    i = rangeRef.current.length;
+                    exactMatch = item.x;
+                } else {
+                    ++i;
                 }
-                if (exactMatch >= 0) {
-                    setLeft(exactMatch);
-                    return;
-                }
+            }
+            if (exactMatch >= 0) {
+                setLeft(exactMatch);
+                return;
+            }
 
-                let rangeVal = {
-                    score: 0,
-                    left: 0,
-                };
-                for (let i = 0; i < rangeRef.current.length; ) {
-                    const item = rangeRef.current[i];
-                    if (
-                        item.value <= scoreValueRef.current &&
-                        rangeRef.current?.[i + 1].value > scoreValueRef.current
-                    ) {
-                        i = rangeRef.current.length;
-                        rangeVal = {
-                            left: item.x,
-                            score: item.value,
-                        };
-                    } else {
-                        ++i;
-                    }
+            let rangeVal = {
+                score: 0,
+                left: 0,
+            };
+            for (let i = 0; i < rangeRef.current.length; ) {
+                const item = rangeRef.current[i];
+                if (
+                    item.value <= scoreValueRef.current &&
+                    rangeRef.current?.[i + 1].value > scoreValueRef.current
+                ) {
+                    i = rangeRef.current.length;
+                    rangeVal = {
+                        left: item.x,
+                        score: item.value,
+                    };
+                } else {
+                    ++i;
                 }
-                setLeft(rangeVal.left);
-                for (let i = 0; i < optionsRef.current.length; i++) {
-                    scoreChangeFn.current(rangeVal.score, optionsRef.current[i]);
-                }
-            });
+            }
+            setLeft(rangeVal.left);
+            for (let i = 0; i < optionsRef.current.length; i++) {
+                scoreChangeFn.current(rangeVal.score, optionsRef.current[i]);
+            }
         };
 
         window.addEventListener("resize", fn);
@@ -266,34 +262,32 @@ const Temp: React.FC<TempProps> = ({
 
         const mainKeyDownFn = (e: KeyboardEvent) => {
             const code = e.key;
-            transitionFn(() => {
-                if (!selectOptionRef.current) {
-                    return;
-                }
-                let status = false;
-                for (let i = 0; i < optionsRef.current.length; ) {
-                    const item = optionsRef.current[i];
-                    if (item.code === selectOptionRef.current.code) {
-                        status = true;
-                        i = optionsRef.current.length;
-                    } else {
-                        ++i;
-                    }
-                }
-                if (!status) {
-                    return;
-                }
-
-                if (!["ArrowRight", "ArrowLeft"].includes(code)) {
-                    return;
-                }
-
-                if (code === "ArrowRight") {
-                    keyDownFn(1);
+            if (!selectOptionRef.current) {
+                return;
+            }
+            let status = false;
+            for (let i = 0; i < optionsRef.current.length; ) {
+                const item = optionsRef.current[i];
+                if (item.code === selectOptionRef.current.code) {
+                    status = true;
+                    i = optionsRef.current.length;
                 } else {
-                    keyDownFn(-1);
+                    ++i;
                 }
-            });
+            }
+            if (!status) {
+                return;
+            }
+
+            if (!["ArrowRight", "ArrowLeft"].includes(code)) {
+                return;
+            }
+
+            if (code === "ArrowRight") {
+                keyDownFn(1);
+            } else {
+                keyDownFn(-1);
+            }
         };
 
         document.addEventListener("keydown", mainKeyDownFn);
@@ -354,9 +348,7 @@ const Temp: React.FC<TempProps> = ({
             /**
              * 防抖滚动
              */
-            transitionFn(() => {
-                wheelFn(status as 1 | -1);
-            });
+            wheelFn(status);
         };
 
         const optionAttr = { passive: false };

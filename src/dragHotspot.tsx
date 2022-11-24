@@ -6,7 +6,7 @@
  */
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import React, { Fragment, useDeferredValue, useEffect, useRef, useState } from "react";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import RatedOption from "./ratedOption";
 import { OptionProps, ScoreOption, ScoreRange } from "./type";
 import { deepCloneData, transformScoreOptions } from "./unit";
@@ -31,7 +31,6 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange }) => {
 
     const [selectOption, setSelectOption] = useState<OptionProps>();
 
-    const deferredScoreDrag = useDeferredValue(scoreDrag);
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
@@ -150,7 +149,7 @@ const Temp: React.FC<TempProps> = ({ scoreOptions, scoreRange }) => {
         >
             <div className={`dragHotspot`}>
                 <div className="sliderTrunk" ref={ref}>
-                    {deferredScoreDrag.map((item, n) => {
+                    {scoreDrag.map((item, n) => {
                         return item.options.length ? (
                             <RatedOption
                                 key={`${item.score}${n}`}
