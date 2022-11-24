@@ -7,6 +7,9 @@ import JumpWrap from "./Component/JumpWrap";
 import Header from "./header";
 import MainContent from "./main";
 
+import vConsole from "vconsole";
+new vConsole();
+
 export const comms = new PluginComms({
     defaultConfig: new ConfigYML(),
 }) as {

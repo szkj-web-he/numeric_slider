@@ -7,12 +7,13 @@
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
 import React, { forwardRef, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Point } from "../type";
 import { getScrollValue } from "../unit";
 import "./style.scss";
+import DragBar from "./Unit/dragBar";
 import { setScrollBar } from "./Unit/setScrollBar";
+import { Point } from "./Unit/type";
 import { useMobile } from "./Unit/useMobile";
-import DragBar from "../Drag";
+import { ScrollBodyContext } from "./Unit/useScrollBody";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -95,6 +96,9 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
             isSmooth,
             stopPropagation = true,
             bodyClassName,
+            onTouchStartCapture,
+            onTouchCancelCapture,
+            onTouchEndCapture,
             ...props
         },
         ref,
@@ -160,9 +164,74 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
             }
         }, [focus, hover]);
 
+        useEffect(() => {
+            const node = scrollEl.current;
+            let destroy = false;
+            let observer: MutationObserver | null = null;
+            const fn = () => {
+                if (destroy) {
+                    return;
+                }
+
+                setScrollBar(node);
+            };
+
+            if (hover && node) {
+                observer = new MutationObserver(fn);
+                observer.observe(node, {
+                    subtree: true,
+                    childList: true,
+                    attributes: true,
+                    characterData: true,
+                });
+            }
+            return () => {
+                observer?.disconnect();
+                destroy = true;
+            };
+        }, [hover]);
+
+        useEffect(() => {
+            let destroy = false;
+            const fn = () => {
+                const node = scrollEl.current;
+                setScrollBar(node);
+            };
+            let timer: number | null = null;
+            if (mobileStatus) {
+                window.addEventListener("load", fn);
+                void document.fonts.ready.then(fn);
+                timer = window.setTimeout(() => {
+                    if (destroy) {
+                        return;
+                    }
+                    fn();
+                }, 1000);
+            }
+            return () => {
+                window.removeEventListener("load", fn);
+                timer && window.clearTimeout(timer);
+                destroy = true;
+            };
+        }, [mobileStatus]);
+
         /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
         /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
         /************* This section will include this component general function *************/
+
+        const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+            setScrollBar(e.currentTarget);
+            setHover(true);
+            onTouchStartCapture?.(e);
+        };
+        const handleTouchCancel = (e: React.TouchEvent<HTMLDivElement>) => {
+            onTouchCancelCapture?.(e);
+            setHover(false);
+        };
+        const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+            onTouchEndCapture?.(e);
+            setHover(false);
+        };
 
         /**
          * 监听滚动
@@ -182,9 +251,7 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
                 clientHeight: el.clientHeight,
                 clientWidth: el.clientWidth,
             });
-            if (mobileStatus) {
-                return;
-            }
+
             setScrollBar(node);
         };
 
@@ -275,8 +342,8 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
                 <></>
             ) : (
                 <DragBar
-                    className={`scroll_scrollBar__vertical${
-                        hover || focus ? ` scroll_scrollBar__active` : ""
+                    className={`scroll_scrollBar__vertical ${
+                        hover || focus || mobileStatus ? ` scroll_scrollBar__active` : ""
                     }`}
                     handleDragStart={showBar}
                     handleDragMove={handleDragMoveOfVertical}
@@ -295,7 +362,7 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
             ) : (
                 <DragBar
                     className={`scroll_scrollBar__horizontal${
-                        hover || focus ? ` scroll_scrollBar__active` : ""
+                        hover || focus || mobileStatus ? ` scroll_scrollBar__active` : ""
                     }`}
                     handleDragStart={showBar}
                     handleDragMove={handleDragMoveOfHorizontal}
@@ -305,45 +372,44 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
                 />
             );
 
-        const containerClassName = ["scroll_scrollContainer"];
-        className && containerClassName.push(className);
-
-        const bodyClassNameList = ["scroll_scrollBody"];
-        bodyClassName && bodyClassNameList.push(bodyClassName);
-
         /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
         return (
-            <div
-                className={containerClassName.join(" ")}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-                ref={ref}
-                style={Object.assign({}, width ? { width } : {}, height ? { height } : {})}
-                {...props}
-            >
-                {verticalBar}
-                {horizontalBar}
+            <ScrollBodyContext.Provider value={scrollEl}>
                 <div
-                    ref={scrollEl}
-                    className={bodyClassNameList.join(" ")}
-                    style={Object.assign(
-                        {},
-                        style,
-                        hidden === true ||
-                            (typeof hidden === "object" && hidden?.x === true
-                                ? { overflowX: "hidden" }
-                                : {}),
-
-                        hidden === true ||
-                            (typeof hidden === "object" && hidden?.y === true
-                                ? { overflowY: "hidden" }
-                                : {}),
-                    )}
-                    onScroll={handleScroll}
+                    className={`scroll_scrollContainer${className ? ` ${className}` : ""}`}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                    onTouchStartCapture={handleTouchStart}
+                    onTouchCancelCapture={handleTouchCancel}
+                    onTouchEndCapture={handleTouchEnd}
+                    ref={ref}
+                    style={Object.assign({}, width ? { width } : {}, height ? { height } : {})}
+                    {...props}
                 >
-                    {children}
+                    {verticalBar}
+                    {horizontalBar}
+                    <div
+                        ref={scrollEl}
+                        className={`scroll_scrollBody${bodyClassName ? ` ${bodyClassName}` : ""}`}
+                        style={Object.assign(
+                            {},
+                            style,
+                            hidden === true ||
+                                (typeof hidden === "object" && hidden?.x === true
+                                    ? { overflowX: "hidden" }
+                                    : {}),
+
+                            hidden === true ||
+                                (typeof hidden === "object" && hidden?.y === true
+                                    ? { overflowY: "hidden" }
+                                    : {}),
+                        )}
+                        onScroll={handleScroll}
+                    >
+                        {children}
+                    </div>
                 </div>
-            </div>
+            </ScrollBodyContext.Provider>
         );
     },
 );

@@ -8,7 +8,6 @@
     flex-flow: row nowrap;
     z-index: 10;
 }
-
 @mixin button {
     flex: 0 0 auto;
     display: flex;
@@ -91,17 +90,15 @@
     z-index: 3;
 }
 
-.jumpBtn_ {
-    &top {
-        @include JumpBtn();
+.top_triangle {
+    @include JumpBtn();
+}
+.bottom_triangle {
+    @include JumpBtn();
+    .jumpBtn_btnIcon {
+        transform: rotate(180deg);
     }
-    &bottom {
-        @include JumpBtn();
-        .jumpBtn_btnIcon {
-            transform: rotate(180deg);
-        }
-        .jumpBtn_activeIcon {
-            transform: rotate(180deg);
-        }
+    .jumpBtn_activeIcon {
+        transform: rotate(180deg);
     }
 }

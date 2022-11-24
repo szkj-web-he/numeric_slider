@@ -12,15 +12,10 @@ import btn from "../../../Image/btn_gray.png";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
-interface TempProps extends React.HTMLAttributes<HTMLDivElement> {
-    active?: boolean;
-
-    placement: "top" | "bottom";
-}
 
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
-const Temp: React.FC<TempProps> = ({ active = false, placement, className, ...props }) => {
+const Temp: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ ...props }) => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
@@ -32,12 +27,7 @@ const Temp: React.FC<TempProps> = ({ active = false, placement, className, ...pr
 
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
-        <div
-            className={`jumpBtn_${placement}${active ? " active" : ""}${
-                className ? ` ${className}` : ""
-            }`}
-            {...props}
-        >
+        <div {...props}>
             <img src={btn} alt="" className="jumpBtn_btnIcon" />
             <img src={activeBtn} alt="" className="jumpBtn_activeIcon" />
         </div>
