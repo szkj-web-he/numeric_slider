@@ -187,6 +187,7 @@ export const useTouch = (
 
         const handleMouseCancel = () => {
             cancelFn.current();
+            console.log("cancel");
             removeHandle();
         };
 
