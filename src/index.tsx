@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 import "./font.scss";
 import "./style.scss";
 
@@ -25,8 +25,6 @@ const Main: React.FC = () => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
 
-    const ref = useRef<HTMLDivElement | null>(null);
-
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
@@ -45,9 +43,7 @@ const Main: React.FC = () => {
     );
     return (
         <div className="wrapper">
-            <ScrollComponent ref={ref} hidden={{ x: true }}>
-                {content}
-            </ScrollComponent>
+            <ScrollComponent hidden={{ x: true }}>{content}</ScrollComponent>
         </div>
     );
 };

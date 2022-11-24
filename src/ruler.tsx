@@ -7,7 +7,6 @@
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
 import React, { useEffect, useRef } from "react";
-import { comms } from ".";
 import { ScaleProps } from "./unit";
 import { useHashId } from "./useHashId";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
@@ -29,6 +28,8 @@ const Temp: React.FC<TempProps> = ({ ruler }) => {
 
     const hashId = useHashId("ruler_");
 
+    const ref = useRef<HTMLDivElement | null>(null);
+
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
@@ -44,46 +45,68 @@ const Temp: React.FC<TempProps> = ({ ruler }) => {
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
     /************* This section will include this component general function *************/
 
-    const matchLastNode = (el: HTMLElement) => {
-        const rect = el.getBoundingClientRect();
-        if (rect.left + rect.width <= document.body.offsetWidth - 5) {
-            return;
-        }
-        if (timer.current) {
-            window.clearTimeout(timer.current);
-            timer.current = undefined;
-        }
-        styleRef.current?.remove();
-        if (el.classList.contains(hashId)) {
-            el.classList.remove(hashId);
-        }
+    useEffect(() => {
+        const fn = () => {
+            const node = ref.current;
 
-        timer.current = window.setTimeout(() => {
-            {
-                document.body.offsetHeight;
+            if (!node) {
+                return;
             }
-            const rect = el.getBoundingClientRect();
 
-            if (rect.left + rect.width > document.body.offsetWidth) {
-                const style = document.createElement("style");
+            const valueEls = node.getElementsByClassName("scaleItemValue");
 
-                style.innerHTML = `.${hashId}
-       {left: -${rect.left + rect.width + 5 - document.body.offsetWidth}px}
+            const matchLastNode = (el: HTMLElement) => {
+                const margin = 10;
+
+                const rect = el.getBoundingClientRect();
+                if (rect.left + rect.width <= document.documentElement.offsetWidth - margin) {
+                    return;
+                }
+                if (timer.current) {
+                    window.clearTimeout(timer.current);
+                    timer.current = undefined;
+                }
+                styleRef.current?.remove();
+                if (el.classList.contains(hashId)) {
+                    el.classList.remove(hashId);
+                }
+
+                if (rect.left + rect.width > document.body.offsetWidth) {
+                    const style = document.createElement("style");
+
+                    style.innerHTML = `.${hashId}
+       {left: -${rect.left + rect.width + margin - document.body.offsetWidth}px}
         `;
 
-                styleRef.current = style;
-                document.body.append(styleRef.current);
+                    styleRef.current = style;
+                    document.body.append(styleRef.current);
 
-                el.classList.add(hashId);
+                    el.classList.add(hashId);
+                }
+            };
+
+            for (let i = 0; i < valueEls.length; i++) {
+                const el = valueEls[i];
+                if (el instanceof HTMLElement) {
+                    matchLastNode(el);
+                }
             }
-            timer.current = undefined;
-        });
-    };
+        };
+
+        fn();
+
+        document.addEventListener("resize", fn);
+        document.fonts.addEventListener("loading", fn);
+        return () => {
+            document.removeEventListener("resize", fn);
+            document.fonts.removeEventListener("loading", fn);
+        };
+    }, [hashId, ruler]);
 
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
         <div className="rulerContainer">
-            <div className="ruler">
+            <div className="ruler" ref={ref}>
                 {ruler?.map((item) => {
                     if (item.status === 1) {
                         return (
@@ -106,21 +129,7 @@ const Temp: React.FC<TempProps> = ({ ruler }) => {
                             >
                                 <div className="scaleItem_icon" />
                                 {item.status === 2 && (
-                                    <div
-                                        className="scaleItemValue"
-                                        ref={(el) => {
-                                            if (item.value !== comms.config.totalScore) {
-                                                return;
-                                            }
-                                            if (!el) {
-                                                return;
-                                            }
-
-                                            matchLastNode(el);
-                                        }}
-                                    >
-                                        {item.value}
-                                    </div>
+                                    <div className="scaleItemValue">{item.value}</div>
                                 )}
                             </div>
                         );
