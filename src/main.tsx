@@ -6,17 +6,14 @@
  */
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import React, { useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { comms } from ".";
 import DragHotspot from "./dragHotspot";
 import Options from "./options";
 import Ruler from "./ruler";
 import { OptionProps, ScoreOption } from "./type";
-import { useRuler } from "./useRuler";
-import { useRef } from "react";
-import { useLayoutEffect } from "react";
 import { deepCloneData } from "./unit";
-import { useEffect } from "react";
+import { useRuler } from "./useRuler";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -29,7 +26,6 @@ const Temp: React.FC = () => {
     const [scoreOptions, setScoreOptions] = useState<Array<ScoreOption>>([]);
 
     const rulerData = useRuler();
-
     const [selectOption, setSelectOption] = useState<OptionProps>();
 
     const scoreOptionsRef = useRef<Array<ScoreOption>>([]);
@@ -47,7 +43,7 @@ const Temp: React.FC = () => {
 
             data[item.code] = option?.value ?? null;
         }
-        comms.state = data;
+        // comms.state = data;
     }, [scoreOptions]);
 
     useLayoutEffect(() => {

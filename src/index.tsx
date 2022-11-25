@@ -24,7 +24,7 @@ export const comms = new PluginComms({
 const Main: React.FC = () => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
-
+    console.log("render");
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
@@ -35,15 +35,12 @@ const Main: React.FC = () => {
 
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
 
-    const content = (
-        <>
-            <Header />
-            <MainContent />
-        </>
-    );
     return (
         <div className="wrapper">
-            <ScrollComponent hidden={{ x: true }}>{content}</ScrollComponent>
+            <ScrollComponent hidden={{ x: true }}>
+                <Header />
+                <MainContent />
+            </ScrollComponent>
         </div>
     );
 };

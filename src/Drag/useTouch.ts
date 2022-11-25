@@ -21,19 +21,19 @@ export const useTouch = (
     /**
      * 开始的事件
      */
-    const startFn = useRef(handleStart);
+    const startFn = useRef<typeof handleStart>();
     /**
      * 结束的事件
      */
-    const endFn = useRef(handleEnd);
+    const endFn = useRef<typeof handleEnd>();
     /**
      * 移动事件
      */
-    const moveFn = useRef(handleMove);
+    const moveFn = useRef<typeof handleMove>();
     /**
      * 取消事件
      */
-    const cancelFn = useRef(handleCancel);
+    const cancelFn = useRef<typeof handleCancel>();
 
     useLayoutEffect(() => {
         startFn.current = handleStart;
@@ -79,7 +79,7 @@ export const useTouch = (
 
             const { pageX, pageY, clientX, clientY } = e.changedTouches[0];
 
-            moveFn.current({
+            moveFn.current?.({
                 pageX,
                 pageY,
                 clientX,
@@ -95,7 +95,7 @@ export const useTouch = (
         const handleTouchEnd = (e: TouchEvent) => {
             removeHandle();
 
-            endFn.current({
+            endFn.current?.({
                 pageX: e.changedTouches[0].pageX,
                 pageY: e.changedTouches[0].pageY,
                 clientX: e.changedTouches[0].clientX,
@@ -106,7 +106,7 @@ export const useTouch = (
         const handleTouchCancel = () => {
             removeHandle();
 
-            cancelFn.current();
+            cancelFn.current?.();
         };
 
         /**
@@ -119,7 +119,7 @@ export const useTouch = (
             e.preventDefault();
             e.stopImmediatePropagation();
 
-            startFn.current({
+            startFn.current?.({
                 pageX: e.changedTouches[0].pageX,
                 pageY: e.changedTouches[0].pageY,
                 clientX: e.changedTouches[0].clientX,
@@ -163,7 +163,7 @@ export const useTouch = (
 
         const handleMouseMove = (e: MouseEvent) => {
             const { pageX, pageY, clientX, clientY } = e;
-            moveFn.current({
+            moveFn.current?.({
                 pageX,
                 pageY,
                 clientX,
@@ -172,7 +172,7 @@ export const useTouch = (
         };
 
         const handleMouseUp = (e: MouseEvent) => {
-            endFn.current({
+            endFn.current?.({
                 pageX: e.pageX,
                 pageY: e.pageY,
                 clientX: e.clientX,
@@ -182,13 +182,13 @@ export const useTouch = (
         };
 
         const handleMouseCancel = () => {
-            cancelFn.current();
+            cancelFn.current?.();
             removeHandle();
         };
 
         const handleMouseDown = (e: MouseEvent) => {
             removeSelect(e);
-            startFn.current({
+            startFn.current?.({
                 pageX: e.pageX,
                 pageY: e.pageY,
                 clientX: e.clientX,

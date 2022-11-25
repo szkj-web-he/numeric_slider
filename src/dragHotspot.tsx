@@ -47,12 +47,12 @@ const Temp: React.FC<TempProps> = ({
 
     const dragEl = useRef<Record<string, HTMLDivElement | null>>({});
 
-    const selectOptionRef = useRef(deepCloneData(selectOption));
+    const selectOptionRef = useRef<typeof selectOption>();
 
-    const rangeRef = useRef(deepCloneData(scoreRange));
+    const rangeRef = useRef<typeof scoreRange>();
 
-    const changeFn = useRef(onChange);
-    const scoreOptionsRef = useRef(deepCloneData(scoreOptions));
+    const changeFn = useRef<typeof onChange>();
+    const scoreOptionsRef = useRef<typeof scoreOptions>();
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
@@ -126,10 +126,11 @@ const Temp: React.FC<TempProps> = ({
             }
 
             let scoreVal = 0;
-            for (let i = 0; i < scoreOptionsRef.current.length; ) {
-                const item = scoreOptionsRef.current[i];
+            const arr = scoreOptionsRef.current ?? [];
+            for (let i = 0; i < arr.length; ) {
+                const item = arr[i];
                 if (item.code === selectOptionRef.current.code) {
-                    i = scoreOptionsRef.current.length;
+                    i = arr.length;
                     scoreVal = item.value;
                 } else {
                     ++i;
@@ -157,7 +158,7 @@ const Temp: React.FC<TempProps> = ({
                         option.value = rangeRef.current[n + status].value;
                     }
                 }
-                changeFn.current(deepCloneData(staticScoreOptions.current));
+                changeFn.current?.(deepCloneData(staticScoreOptions.current));
             }
         };
 
