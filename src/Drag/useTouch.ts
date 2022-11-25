@@ -159,13 +159,10 @@ export const useTouch = (
             window.getSelection()?.removeAllRanges();
             selectedFn.current = document.onselectstart;
             document.onselectstart = () => false;
-            e.preventDefault();
-            e.stopPropagation();
         };
 
         const handleMouseMove = (e: MouseEvent) => {
             const { pageX, pageY, clientX, clientY } = e;
-            console.log("handleMouseMove");
             moveFn.current({
                 pageX,
                 pageY,
@@ -182,12 +179,10 @@ export const useTouch = (
                 clientY: e.clientY,
             });
             removeHandle();
-            console.log("handleMouseUp");
         };
 
         const handleMouseCancel = () => {
             cancelFn.current();
-            console.log("cancel");
             removeHandle();
         };
 
