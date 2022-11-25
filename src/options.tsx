@@ -43,13 +43,11 @@ const Temp: React.FC<TempProps> = ({ setList, list, setSelectOption }) => {
                 ++i;
             }
         }
-        const arr = deepCloneData(list);
+        const arr = [deepCloneData(item)] as ScoreOption[];
 
         if (n >= 0) {
-            arr.splice(n, 1);
             setSelectOption(undefined);
         } else {
-            arr.push({ ...item, value: 0 });
             setSelectOption(deepCloneData(item));
         }
         setList([...arr]);
