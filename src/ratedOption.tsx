@@ -80,6 +80,8 @@ const Temp: React.FC<TempProps> = ({
     const leftValueRef = useRef(0);
     const [leftValue, setLeftValue] = useState(0);
 
+    const moveTimer = useRef<number>();
+
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
@@ -221,6 +223,7 @@ const Temp: React.FC<TempProps> = ({
     useEffect(() => {
         return () => {
             styleRef.current?.remove();
+            moveTimer.current = undefined;
         };
     }, []);
 
@@ -230,10 +233,14 @@ const Temp: React.FC<TempProps> = ({
 
     const handleDragEnd = () => {
         offsetX.current = 0;
+        moveTimer.current && window.clearTimeout(moveTimer.current);
+        moveTimer.current = undefined;
     };
 
     const handleDragStart = (res: Point) => {
         handleFocused(true);
+        moveTimer.current && window.clearTimeout(moveTimer.current);
+        moveTimer.current = undefined;
         const el = point.current;
         if (!el) {
             return;
@@ -244,28 +251,32 @@ const Temp: React.FC<TempProps> = ({
     };
 
     const handleDragMove = (res: Point) => {
-        if (!parent) {
-            return;
-        }
-        const rect = parent.getBoundingClientRect();
-        const scrollData = getScrollValue();
-        const left = res.pageX - offsetX.current - rect.left - scrollData.x;
-
-        if (!range) {
-            return;
-        }
-        let score = 0;
-        for (let i = 0; i < range.length; ) {
-            const item = range[i];
-
-            if (item.min <= left && item.max > left) {
-                i = range.length;
-                score = item.value;
-            } else {
-                ++i;
+        moveTimer.current && window.clearTimeout(moveTimer.current);
+        moveTimer.current = window.setTimeout(() => {
+            moveTimer.current = undefined;
+            if (!parent) {
+                return;
             }
-        }
-        handleScoreChange(score);
+            const rect = parent.getBoundingClientRect();
+            const scrollData = getScrollValue();
+            const left = res.pageX - offsetX.current - rect.left - scrollData.x;
+
+            if (!range) {
+                return;
+            }
+            let score = 0;
+            for (let i = 0; i < range.length; ) {
+                const item = range[i];
+
+                if (item.min <= left && item.max > left) {
+                    i = range.length;
+                    score = item.value;
+                } else {
+                    ++i;
+                }
+            }
+            handleScoreChange(score);
+        });
     };
 
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
