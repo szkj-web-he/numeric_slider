@@ -6,7 +6,7 @@
  */
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import React, { forwardRef, useRef } from "react";
+import React, { forwardRef, useEffect, useRef } from "react";
 import { Point } from "../type";
 import { getScrollValue } from "../unit";
 import { useTouch } from "./useTouch";
@@ -39,13 +39,19 @@ const Temp = forwardRef<HTMLDivElement, TempProps>(
         /* <------------------------------------ **** STATE START **** ------------------------------------ */
         /************* This section will include this component HOOK function *************/
 
+        const timer = useRef<number>();
+
         const offset = useRef({
             x: 0,
             y: 0,
         });
 
+        const globalClass = useRef<HTMLStyleElement>();
+
         const cRef = useTouch(
             (res) => {
+                timer.current && window.clearTimeout(timer.current);
+                timer.current = undefined;
                 //开始
                 const node = cRef.current;
                 if (!node) {
@@ -61,6 +67,14 @@ const Temp = forwardRef<HTMLDivElement, TempProps>(
                     y: res.pageY - top,
                 };
 
+                const pointerStyle = window.getComputedStyle(node, null).cursor;
+                globalClass.current = document.createElement("style");
+                globalClass.current.innerHTML = `
+                *{
+                    cursor:${pointerStyle} !important;
+                }
+                `;
+                document.head.append(globalClass.current);
                 handleDragStart?.({
                     offsetX: offset.current.x,
                     offsetY: offset.current.y,
@@ -72,18 +86,25 @@ const Temp = forwardRef<HTMLDivElement, TempProps>(
             },
             (res) => {
                 //移动中
-                handleDragMove?.({
-                    offsetX: offset.current.x,
-                    offsetY: offset.current.y,
-                    pageX: res.pageX,
-                    pageY: res.pageY,
-                    clientX: res.clientX,
-                    clientY: res.clientY,
+                timer.current && window.clearTimeout(timer.current);
+                timer.current = window.setTimeout(() => {
+                    timer.current = undefined;
+                    handleDragMove?.({
+                        offsetX: offset.current.x,
+                        offsetY: offset.current.y,
+                        pageX: res.pageX,
+                        pageY: res.pageY,
+                        clientX: res.clientX,
+                        clientY: res.clientY,
+                    });
                 });
             },
             (res) => {
                 //结束移动
-
+                timer.current && window.clearTimeout(timer.current);
+                timer.current = undefined;
+                globalClass.current?.remove();
+                globalClass.current = undefined;
                 handleDragEnd?.({
                     offsetX: offset.current.x,
                     offsetY: offset.current.y,
@@ -98,6 +119,10 @@ const Temp = forwardRef<HTMLDivElement, TempProps>(
                 };
             },
             () => {
+                timer.current && window.clearTimeout(timer.current);
+                timer.current = undefined;
+                globalClass.current?.remove();
+                globalClass.current = undefined;
                 //取消移动
                 handleDragCancel?.();
                 offset.current = {
@@ -109,6 +134,13 @@ const Temp = forwardRef<HTMLDivElement, TempProps>(
         /* <------------------------------------ **** STATE END **** ------------------------------------ */
         /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
         /************* This section will include this component parameter *************/
+        useEffect(() => {
+            return () => {
+                timer.current && window.clearTimeout(timer.current);
+                globalClass.current?.remove();
+                globalClass.current = undefined;
+            };
+        }, []);
         /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
         /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
         /************* This section will include this component general function *************/
