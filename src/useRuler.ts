@@ -4,7 +4,6 @@ import { deepCloneData, ScaleProps, setScale } from "./unit";
 
 const getState = (): undefined | [ScaleProps[], ScoreRange[]] => {
     const scaleArr = setScale();
-    console.log("getState");
     if (!scaleArr) {
         return;
     }
@@ -38,7 +37,6 @@ export const useRuler = (): undefined | [ScaleProps[], ScoreRange[]] => {
 
     useEffect(() => {
         const fn = () => {
-            console.log(213);
             const data = getState();
             if (JSON.stringify(data) === JSON.stringify(stateRef.current)) {
                 return;

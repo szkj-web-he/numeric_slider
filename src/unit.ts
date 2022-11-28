@@ -103,6 +103,9 @@ const normalScale = (margin: number, total: number, score: number): ScaleProps[]
     const arr: ScaleProps[] = [];
 
     let index = 0;
+
+    const endLength = String(score).length * 8;
+
     for (let i = 0; i < score; i += dScore) {
         const left = (i / dScore) * dPx;
         if (left > total) {
@@ -117,7 +120,9 @@ const normalScale = (margin: number, total: number, score: number): ScaleProps[]
             }
             ++index;
 
-            if (left + dPx + 5 >= total && status === 2) {
+            const length = (String(i).length * 8) / 2;
+
+            if (left + length + endLength + 5 >= total && status === 2) {
                 status = 1.5;
             }
             arr.push({
@@ -195,3 +200,5 @@ export const transformScoreOptions = (res: OptionProps[], pre?: ScoreOptions[]):
     }
     return arr;
 };
+
+export const forceReflow = (): number => document.body.offsetHeight;
