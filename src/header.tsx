@@ -34,7 +34,7 @@ const Temp: React.FC = () => {
             <div
                 className="questionDes"
                 dangerouslySetInnerHTML={{
-                    __html: `(${comms.config.instruction ?? ""})`,
+                    __html: comms.config.instruction ? `(${comms.config.instruction})` : "",
                 }}
             />
         </div>
