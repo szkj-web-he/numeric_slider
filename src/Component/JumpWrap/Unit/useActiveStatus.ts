@@ -27,6 +27,15 @@ export const getElements = (id: string): HTMLElement[] => {
     return arr;
 };
 
+/**
+ * 第一个node界定啊的top距离和第二个node节点的top距离之前的差值
+ */
+export const sameTop = (el: HTMLElement, parent: HTMLElement): number => {
+    const elRect = el.getBoundingClientRect();
+    const parentRect = parent.getBoundingClientRect();
+    return elRect.top - parentRect.top;
+};
+
 export const useActiveStatus = (
     ref: RefObject<HTMLDivElement | null>,
     id: string,
@@ -44,23 +53,20 @@ export const useActiveStatus = (
 
         const scrollBody = getScrollBody(ref.current);
 
-        const arr = getElements(id);
+        if (!scrollBody) {
+            return;
+        }
 
+        const arr = getElements(id);
         let n = -1;
-        const scrollTop = scrollBody?.scrollTop ?? 0;
         for (let i = 0; i < arr.length; ) {
             const item = arr[i];
-            if (i === arr.length - 1) {
-                if (item && item?.offsetTop + item.offsetHeight > scrollTop) {
-                    n = i;
-                    i = arr.length;
-                } else {
-                    ++i;
-                }
-            } else if (item && item?.offsetTop >= scrollTop) {
+            const marginTop = sameTop(item, scrollBody);
+
+            if (marginTop > -5) {
                 n = i;
                 i = arr.length;
-            } else {
+            } else if (marginTop < 0) {
                 ++i;
             }
         }
@@ -75,7 +81,8 @@ export const useActiveStatus = (
         activeIndex.current = n;
         setTopActive(n > 0);
         setBottomActive(n < arr.length - 1);
-    }, [id, ref]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [id]);
 
     useEffect(() => {
         update();
