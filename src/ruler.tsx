@@ -7,7 +7,7 @@
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
 import React, { useEffect, useRef } from "react";
-import { ScaleProps } from "./unit";
+import { forceReflow, ScaleProps } from "./unit";
 import { useHashId } from "./useHashId";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
@@ -24,8 +24,6 @@ const Temp: React.FC<TempProps> = ({ ruler }) => {
 
     const styleRef = useRef<HTMLStyleElement>();
 
-    const timer = useRef<number>();
-
     const hashId = useHashId("ruler_");
 
     const ref = useRef<HTMLDivElement | null>(null);
@@ -36,7 +34,6 @@ const Temp: React.FC<TempProps> = ({ ruler }) => {
 
     useEffect(() => {
         return () => {
-            timer.current && window.clearTimeout(timer.current);
             styleRef.current?.remove();
         };
     }, []);
@@ -46,44 +43,42 @@ const Temp: React.FC<TempProps> = ({ ruler }) => {
     /************* This section will include this component general function *************/
 
     useEffect(() => {
+        let timer: null | number = null;
+        const matchLastNode = (el: HTMLElement) => {
+            const margin = 10;
+
+            const rect = el.getBoundingClientRect();
+            if (rect.left + rect.width <= document.documentElement.offsetWidth - margin) {
+                return;
+            }
+            styleRef.current?.remove();
+            if (el.classList.contains(hashId)) {
+                el.classList.remove(hashId);
+            }
+            forceReflow();
+            timer = window.setTimeout(() => {
+                const style = document.createElement("style");
+
+                style.innerHTML = `.${hashId}
+       {left: -${rect.left + rect.width + margin - document.body.offsetWidth}px}
+        `;
+
+                styleRef.current = style;
+                document.body.append(styleRef.current);
+
+                el.classList.add(hashId);
+            });
+        };
+
         const fn = () => {
             const node = ref.current;
 
             if (!node) {
                 return;
             }
+            timer && window.clearTimeout(timer);
 
             const valueEls = node.getElementsByClassName("scaleItemValue");
-
-            const matchLastNode = (el: HTMLElement) => {
-                const margin = 10;
-
-                const rect = el.getBoundingClientRect();
-                if (rect.left + rect.width <= document.documentElement.offsetWidth - margin) {
-                    return;
-                }
-                if (timer.current) {
-                    window.clearTimeout(timer.current);
-                    timer.current = undefined;
-                }
-                styleRef.current?.remove();
-                if (el.classList.contains(hashId)) {
-                    el.classList.remove(hashId);
-                }
-
-                if (rect.left + rect.width > document.body.offsetWidth) {
-                    const style = document.createElement("style");
-
-                    style.innerHTML = `.${hashId}
-       {left: -${rect.left + rect.width + margin - document.body.offsetWidth}px}
-        `;
-
-                    styleRef.current = style;
-                    document.body.append(styleRef.current);
-
-                    el.classList.add(hashId);
-                }
-            };
 
             for (let i = 0; i < valueEls.length; i++) {
                 const el = valueEls[i];
@@ -100,6 +95,7 @@ const Temp: React.FC<TempProps> = ({ ruler }) => {
         return () => {
             document.removeEventListener("resize", fn);
             document.fonts.removeEventListener("loading", fn);
+            timer && window.clearTimeout(timer);
         };
     }, [hashId, ruler]);
 
