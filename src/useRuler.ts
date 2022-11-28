@@ -1,42 +1,47 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ScoreRange } from "./type";
-import { ScaleProps, setScale } from "./unit";
+import { deepCloneData, ScaleProps, setScale } from "./unit";
 
 const getState = (): undefined | [ScaleProps[], ScoreRange[]] => {
-    const scaleData = setScale();
-    if (!scaleData) {
+    const scaleArr = setScale();
+    if (!scaleArr) {
         return;
     }
-
-    const scaleArr = scaleData.scale;
 
     const arr: ScoreRange[] = [];
     let min = -Infinity;
 
     for (let i = 0; i < scaleArr.length; i++) {
+        const item = scaleArr[i];
+        const d = scaleArr[i + 1] ? (scaleArr[i + 1].left - item.left) / 2 : undefined;
+
         arr.push({
-            value: scaleArr[i].value,
+            value: item.value,
             min,
-            max: scaleArr[i + 1] ? scaleArr[i + 1].left : Infinity,
-            x: scaleArr[i].left,
+            max: d ? item.left + d : Infinity,
+            x: item.left,
         });
         min = scaleArr[i].left;
     }
-    return [scaleData.scale, arr];
+    return [scaleArr, arr];
 };
 
 export const useRuler = (): undefined | [ScaleProps[], ScoreRange[]] => {
-    const stateRef = useRef(JSON.stringify(getState()));
+    const stateRef = useRef<ReturnType<typeof getState>>();
 
-    const [state, setState] = useState(getState());
+    const [state, setState] = useState(() => getState());
+
+    useLayoutEffect(() => {
+        stateRef.current = deepCloneData(state);
+    }, [state]);
 
     useEffect(() => {
         const fn = () => {
             const data = getState();
-            if (JSON.stringify(data) === stateRef.current) {
+            if (JSON.stringify(data) === JSON.stringify(stateRef.current)) {
                 return;
             }
-            stateRef.current = JSON.stringify(data);
+            stateRef.current = deepCloneData(data);
             setState(data);
         };
         window.addEventListener("resize", fn);
