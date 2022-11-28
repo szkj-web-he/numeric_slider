@@ -43,7 +43,7 @@ const Temp: React.FC = () => {
 
             data[item.code] = option?.value ?? null;
         }
-        // comms.state = data;
+        comms.state = data;
     }, [scoreOptions]);
 
     useLayoutEffect(() => {
