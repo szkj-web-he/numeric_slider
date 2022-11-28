@@ -39,9 +39,13 @@ const Temp: React.FC = () => {
     /************* This section will include this component parameter *************/
 
     useEffect(() => {
-        const data: Record<string, number> = {};
-        for (let i = 0; i < scoreOptions.length; i++) {
-            data[scoreOptions[i].code] = scoreOptions[i].value;
+        const data: Record<string, number | null> = {};
+        const arr = comms.config.options ?? [];
+        for (let i = 0; i < arr.length; i++) {
+            const item = arr[i];
+            const option = scoreOptions.find((option) => option.code === item.code);
+
+            data[item.code] = option?.value ?? null;
         }
         comms.state = data;
     }, [scoreOptions]);

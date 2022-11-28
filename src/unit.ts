@@ -31,11 +31,18 @@ export const getScrollValue = (): {
         y,
     };
 };
+/**
+ * 0 => 小刻度
+ * 1 => 两个大刻度之间的中刻度
+ * 2 => 大刻度
+ * 1.5 => 也是大刻度  只是因为临近终点 且又不是最总的值 所以不做展示
+ */
+type ScaleStatus = 0 | 1 | 2 | 1.5;
 
 export interface ScaleProps {
     value: number;
     left: number;
-    status: 0 | 1 | 2 | 1.5;
+    status: ScaleStatus;
 }
 
 /**
@@ -49,70 +56,97 @@ export interface ScaleProps {
  * incrementVal => 每个刻度之间相差的分数
  * v => 一分 需要多少像素
  */
-const normalScale = (
-    margin: number,
-    total: number,
-    score: number,
-): { scale: ScaleProps[]; margin: number; incrementVal: number; v: number } => {
-    const arr: ScaleProps[] = [
-        {
-            value: 0,
-            left: 0,
-            status: 2,
-        },
-    ];
-
-    // 1刻度 等于多少像素
-    const d = total / score;
-
-    let incrementVal = 1;
-    if (d < margin) {
-        incrementVal = Math.ceil(margin / d);
-    }
-
-    let count = 0;
-    for (let i = incrementVal; i < score; i += incrementVal) {
-        ++count;
-        const data: ScaleProps = {
-            value: i,
-            left: i * d,
-            status: 0,
-        };
-        if (count === 5) {
-            data.status = 1;
-        } else if (count === 10) {
-            data.status = 2;
-            count = 0;
+const normalScale = (margin: number, total: number, score: number): ScaleProps[] => {
+    //递增的分数值
+    let dScore: number;
+    //递增的像素值
+    let dPx: number;
+    if (total / score > margin && score < Math.floor(total / 10)) {
+        /**
+         * 可以放下
+         * 且分割的数量小于总宽度的1/10
+         */
+        dScore = 1;
+        dPx = total / score;
+    } else {
+        /**
+         * 看看总宽度 可以被谁整除
+         * 从最小的margin值开始递增
+         * 直到可以被整除为止
+         */
+        let reasonableMargin = margin;
+        /**
+         * 由这个margin一个分成了多少等分
+         * 一定是个整数
+         * 不能是小数
+         */
+        let bisectrix = total / reasonableMargin + 1;
+        /**
+         * 分割的数量 成大于自身的1/10
+         * 不然看起来会很凌乱
+         */
+        while (bisectrix > Math.floor(total / 10) || bisectrix > score) {
+            reasonableMargin++;
+            bisectrix = Math.floor(total / reasonableMargin);
         }
 
-        const val = data.left + d * incrementVal;
+        /**
+         * 看看递增值是多少
+         */
+        dScore = Math.floor(score / bisectrix);
+        dPx = reasonableMargin;
+    }
 
-        if (data.status === 2) {
-            if (val > total - 50) {
-                data.status = 1.5;
+    const arr: ScaleProps[] = [];
+
+    let index = 0;
+
+    const endLength = String(score).length * 8;
+
+    for (let i = 0; i < score; i += dScore) {
+        const left = (i / dScore) * dPx;
+        if (left > total) {
+            i = score;
+        } else {
+            let status: ScaleStatus = 0;
+            if (!(index % 10)) {
+                status = 2;
+                index = 0;
+            } else if (!(index % 5)) {
+                status = 1;
             }
-            arr.push(data);
-        } else if (val <= total) {
-            arr.push(data);
-        }
+            ++index;
 
-        if (i + incrementVal >= score) {
-            arr.push({
-                value: score,
-                left: total,
-                status: 2,
-            });
+            const length = (String(i).length * 8) / 2;
+
+            if (left + length + endLength + 5 >= total && status === 2) {
+                status = 1.5;
+            }
+            if (left > total - dPx) {
+                i = score;
+            } else {
+                arr.push({
+                    value: i,
+                    left,
+                    status,
+                });
+            }
         }
     }
-    return { scale: arr, margin: d * incrementVal, incrementVal, v: d };
+
+    arr.push({
+        value: score,
+        left: total,
+        status: 2,
+    });
+
+    return arr;
 };
 
 /**
  * 设置刻度值
  */
-export const setScale = ():
-    | { scale: ScaleProps[]; margin: number; incrementVal: number; v: number }
-    | undefined => {
+export const setScale = (): ScaleProps[] | undefined => {
     if (!comms.config.totalScore) {
         return;
     }
@@ -164,3 +198,5 @@ export const drawRect = (
     ctx.arc(width - r, y + 7, r, Math.PI + (Math.PI / 4) * 3, 2 * Math.PI);
     ctx.closePath();
 };
+
+export const forceReflow = (): number => document.body.offsetHeight;
