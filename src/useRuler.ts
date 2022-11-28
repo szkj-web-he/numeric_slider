@@ -3,28 +3,28 @@ import { ScoreRange } from "./type";
 import { ScaleProps, setScale } from "./unit";
 
 const getState = (): undefined | [ScaleProps[], ScoreRange[]] => {
-    const scaleData = setScale();
-    if (!scaleData) {
+    const scaleArr = setScale();
+    if (!scaleArr) {
         return;
     }
-
-    const scaleArr = scaleData.scale;
 
     const arr: ScoreRange[] = [];
     let min = -Infinity;
 
     for (let i = 0; i < scaleArr.length; i++) {
+        const item = scaleArr[i];
+        const d = scaleArr[i + 1] ? (scaleArr[i + 1].left - item.left) / 2 : undefined;
+
         arr.push({
-            value: scaleArr[i].value,
+            value: item.value,
             min,
-            max: scaleArr[i + 1] ? scaleArr[i + 1].left : Infinity,
-            x: scaleArr[i].left,
+            max: d ? item.left + d : Infinity,
+            x: item.left,
         });
         min = scaleArr[i].left;
     }
-    return [scaleData.scale, arr];
+    return [scaleArr, arr];
 };
-
 export const useRuler = (): undefined | [ScaleProps[], ScoreRange[]] => {
     const stateRef = useRef(JSON.stringify(getState()));
 

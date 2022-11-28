@@ -7,8 +7,7 @@
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
 import React, { useEffect, useRef } from "react";
-import { comms } from ".";
-import { ScaleProps } from "./unit";
+import { forceReflow, ScaleProps } from "./unit";
 import { useHashId } from "./useHashId";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
@@ -25,9 +24,9 @@ const Temp: React.FC<TempProps> = ({ ruler }) => {
 
     const styleRef = useRef<HTMLStyleElement>();
 
-    const timer = useRef<number>();
-
     const hashId = useHashId("ruler_");
+
+    const ref = useRef<HTMLDivElement | null>(null);
 
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
@@ -35,55 +34,75 @@ const Temp: React.FC<TempProps> = ({ ruler }) => {
 
     useEffect(() => {
         return () => {
-            timer.current && window.clearTimeout(timer.current);
             styleRef.current?.remove();
         };
     }, []);
 
-    /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
-    /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
-    /************* This section will include this component general function *************/
+    useEffect(() => {
+        let timer: null | number = null;
+        const matchLastNode = (el: HTMLElement) => {
+            const margin = 10;
 
-    const matchLastNode = (el: HTMLElement) => {
-        const rect = el.getBoundingClientRect();
-        if (rect.left + rect.width <= document.body.offsetWidth - 5) {
-            return;
-        }
-        if (timer.current) {
-            window.clearTimeout(timer.current);
-            timer.current = undefined;
-        }
-        styleRef.current?.remove();
-        if (el.classList.contains(hashId)) {
-            el.classList.remove(hashId);
-        }
-
-        timer.current = window.setTimeout(() => {
-            {
-                document.body.offsetHeight;
-            }
             const rect = el.getBoundingClientRect();
-
-            if (rect.left + rect.width > document.body.offsetWidth) {
+            if (rect.left + rect.width <= document.documentElement.offsetWidth - margin) {
+                return;
+            }
+            styleRef.current?.remove();
+            if (el.classList.contains(hashId)) {
+                el.classList.remove(hashId);
+            }
+            forceReflow();
+            timer = window.setTimeout(() => {
                 const style = document.createElement("style");
 
                 style.innerHTML = `.${hashId}
-       {left: -${rect.left + rect.width + 5 - document.body.offsetWidth}px}
+       {left: -${rect.left + rect.width + margin - document.body.offsetWidth}px}
         `;
 
                 styleRef.current = style;
                 document.body.append(styleRef.current);
 
                 el.classList.add(hashId);
+            });
+        };
+
+        const fn = () => {
+            const node = ref.current;
+
+            if (!node) {
+                return;
             }
-            timer.current = undefined;
-        });
-    };
+            timer && window.clearTimeout(timer);
+
+            const valueEls = node.getElementsByClassName("scaleItemValue");
+
+            for (let i = 0; i < valueEls.length; i++) {
+                const el = valueEls[i];
+                if (el instanceof HTMLElement) {
+                    matchLastNode(el);
+                }
+            }
+        };
+
+        fn();
+
+        document.addEventListener("resize", fn);
+        document.fonts.addEventListener("loading", fn);
+        return () => {
+            document.removeEventListener("resize", fn);
+            document.fonts.removeEventListener("loading", fn);
+            timer && window.clearTimeout(timer);
+        };
+    }, [hashId, ruler]);
+
+    /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
+    /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
+    /************* This section will include this component general function *************/
 
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
         <div className="rulerContainer">
-            <div className="ruler">
+            <div className="ruler" ref={ref}>
                 {ruler?.map((item) => {
                     if (item.status === 1) {
                         return (
@@ -106,21 +125,7 @@ const Temp: React.FC<TempProps> = ({ ruler }) => {
                             >
                                 <div className="scaleItem_icon" />
                                 {item.status === 2 && (
-                                    <div
-                                        className="scaleItemValue"
-                                        ref={(el) => {
-                                            if (item.value !== comms.config.totalScore) {
-                                                return;
-                                            }
-                                            if (!el) {
-                                                return;
-                                            }
-
-                                            matchLastNode(el);
-                                        }}
-                                    >
-                                        {item.value}
-                                    </div>
+                                    <div className="scaleItemValue">{item.value}</div>
                                 )}
                             </div>
                         );
