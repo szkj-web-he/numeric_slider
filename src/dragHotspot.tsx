@@ -79,7 +79,7 @@ const Temp: React.FC<TempProps> = ({
         let timer: null | number = null;
 
         const fn = () => {
-            const els = document.querySelectorAll(".ratedOption_items");
+            const els = node.querySelectorAll(".ratedOption_items");
             let max = 0;
             for (let i = 0; i < els.length; i++) {
                 const el = els[i];
