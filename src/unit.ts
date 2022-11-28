@@ -125,11 +125,15 @@ const normalScale = (margin: number, total: number, score: number): ScaleProps[]
             if (left + length + endLength + 5 >= total && status === 2) {
                 status = 1.5;
             }
-            arr.push({
-                value: i,
-                left,
-                status,
-            });
+            if (left === total) {
+                i = score;
+            } else {
+                arr.push({
+                    value: i,
+                    left,
+                    status,
+                });
+            }
         }
     }
 
