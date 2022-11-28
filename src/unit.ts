@@ -81,7 +81,7 @@ const normalScale = (margin: number, total: number, score: number): ScaleProps[]
          * 一定是个整数
          * 不能是小数
          */
-        let bisectrix = total / reasonableMargin;
+        let bisectrix = total / reasonableMargin + 1;
 
         /**
          * 分割的数量 成大于自身的1/10
