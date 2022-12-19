@@ -58,7 +58,7 @@ const Temp: React.FC<TempProps> = ({ setList, list, setSelectOption }) => {
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     const content = (
         <div className="options_items">
-            {comms.config.options?.[1].map((item) => {
+            {comms.config.options?.map((item) => {
                 const isActive = list.some((option) => option.code === item.code);
                 return (
                     <div
@@ -81,8 +81,7 @@ const Temp: React.FC<TempProps> = ({ setList, list, setSelectOption }) => {
     return (
         <div className="options">
             <div className="options_total">
-                共 <span className="options_totalVal">{comms.config.options?.[1].length ?? 0}</span>
-                项
+                共 <span className="options_totalVal">{comms.config.options?.length ?? 0}</span>项
             </div>
             <ScrollComponent hidden={{ x: true }} bodyClassName="options_scrollBody">
                 {content}

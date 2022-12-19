@@ -33,6 +33,7 @@ body {
     flex-flow: row wrap;
     width: 100%;
     flex: 0 0 auto;
+    margin-bottom: 24px;
 }
 
 .questionContent {
@@ -333,30 +334,6 @@ body {
     left: 0;
     width: 0;
     height: 100%;
-}
-
-.ratedOption_joinIcon {
-    width: 2px;
-    height: 8px;
-    object-fit: cover;
-    object-position: center center;
-    position: absolute;
-    top: -17px;
-}
-
-.group_top {
-    font-family: $fontFamily;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 24px;
-    display: flex;
-    align-items: center;
-    letter-spacing: 0.2px;
-    color: #4d4d4d;
-    @include Padding();
-    margin-bottom: 24px;
-    margin-top: 32px;
 }
 
 .hr_wrap {
