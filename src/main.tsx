@@ -6,19 +6,16 @@
  */
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import React, { useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState, Fragment } from "react";
 import { comms } from ".";
+import { Group } from "./Component/Group";
 import DragHotspot from "./dragHotspot";
+import Hr from "./hr";
 import Options from "./options";
 import Ruler from "./ruler";
 import { OptionProps, ScoreOption } from "./type";
-import { useRuler } from "./useRuler";
-import { useRef } from "react";
-import { useLayoutEffect } from "react";
 import { deepCloneData } from "./unit";
-import { useEffect } from "react";
-import { Group } from "./Component/Group";
-import Hr from "./hr";
+import { useRuler } from "./useRuler";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -142,7 +139,10 @@ const Temp: React.FC = () => {
                                     .filter((rule) => {
                                         return rule.status === 2 || rule.status === 1.5;
                                     })
-                                    .map((rule) => {
+                                    .map((rule, n) => {
+                                        if (n === 0 || n === rulerData?.[0].length - 1) {
+                                            return <Fragment key={rule.left} />;
+                                        }
                                         return (
                                             <div
                                                 className="placeBlank"
