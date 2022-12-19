@@ -18,6 +18,7 @@ import { useLayoutEffect } from "react";
 import { deepCloneData } from "./unit";
 import { useEffect } from "react";
 import { Group } from "./Component/Group";
+import Hr from "./hr";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -103,7 +104,7 @@ const Temp: React.FC = () => {
                             }}
                             list={scoreOptions?.[item.code] ?? []}
                         />
-                        <div className="hr" />
+                        <Hr />
                         <div className="place">
                             <div className="placeTips">{comms.config.optionsInstruction}</div>
                             <Ruler ruler={rulerData?.[0]} />
@@ -136,7 +137,23 @@ const Temp: React.FC = () => {
                                     );
                                     setScoreOptions(deepCloneData(scoreOptionsRef.current));
                                 }}
-                            />
+                            >
+                                {rulerData?.[0]
+                                    .filter((rule) => {
+                                        return rule.status === 2 || rule.status === 1.5;
+                                    })
+                                    .map((rule) => {
+                                        return (
+                                            <div
+                                                className="placeBlank"
+                                                key={rule.left}
+                                                style={{
+                                                    left: `${rule.left}px`,
+                                                }}
+                                            />
+                                        );
+                                    })}
+                            </DragHotspot>
                         </div>
                     </Group>
                 );

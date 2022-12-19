@@ -13,7 +13,6 @@ import DragBar from "./Unit/dragBar";
 import { setScrollBar } from "./Unit/setScrollBar";
 import { Point } from "./Unit/type";
 import { useMobile } from "./Unit/useMobile";
-import { ScrollBodyContext } from "./Unit/useScrollBody";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -374,42 +373,40 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
 
         /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
         return (
-            <ScrollBodyContext.Provider value={scrollEl}>
+            <div
+                className={`scroll_scrollContainer${className ? ` ${className}` : ""}`}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                onTouchStartCapture={handleTouchStart}
+                onTouchCancelCapture={handleTouchCancel}
+                onTouchEndCapture={handleTouchEnd}
+                ref={ref}
+                style={Object.assign({}, width ? { width } : {}, height ? { height } : {})}
+                {...props}
+            >
+                {verticalBar}
+                {horizontalBar}
                 <div
-                    className={`scroll_scrollContainer${className ? ` ${className}` : ""}`}
-                    onMouseEnter={handleMouseEnter}
-                    onMouseLeave={handleMouseLeave}
-                    onTouchStartCapture={handleTouchStart}
-                    onTouchCancelCapture={handleTouchCancel}
-                    onTouchEndCapture={handleTouchEnd}
-                    ref={ref}
-                    style={Object.assign({}, width ? { width } : {}, height ? { height } : {})}
-                    {...props}
-                >
-                    {verticalBar}
-                    {horizontalBar}
-                    <div
-                        ref={scrollEl}
-                        className={`scroll_scrollBody${bodyClassName ? ` ${bodyClassName}` : ""}`}
-                        style={Object.assign(
-                            {},
-                            style,
-                            hidden === true ||
-                                (typeof hidden === "object" && hidden?.x === true
-                                    ? { overflowX: "hidden" }
-                                    : {}),
+                    ref={scrollEl}
+                    className={`scroll_scrollBody${bodyClassName ? ` ${bodyClassName}` : ""}`}
+                    style={Object.assign(
+                        {},
+                        style,
+                        hidden === true ||
+                            (typeof hidden === "object" && hidden?.x === true
+                                ? { overflowX: "hidden" }
+                                : {}),
 
-                            hidden === true ||
-                                (typeof hidden === "object" && hidden?.y === true
-                                    ? { overflowY: "hidden" }
-                                    : {}),
-                        )}
-                        onScroll={handleScroll}
-                    >
-                        {children}
-                    </div>
+                        hidden === true ||
+                            (typeof hidden === "object" && hidden?.y === true
+                                ? { overflowY: "hidden" }
+                                : {}),
+                    )}
+                    onScroll={handleScroll}
+                >
+                    {children}
                 </div>
-            </ScrollBodyContext.Provider>
+            </div>
         );
     },
 );

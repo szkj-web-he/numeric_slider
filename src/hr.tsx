@@ -1,8 +1,8 @@
 /**
- * @file
- * @date 2022-08-11
+ * @file 分割线
+ * @date 2022-12-15
  * @author xuejie.he
- * @lastModify xuejie.he 2022-08-11
+ * @lastModify xuejie.he 2022-12-15
  */
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
@@ -23,9 +23,9 @@ const Temp: React.FC = () => {
     /************* This section will include this component general function *************/
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
-        <div className="ratedOption_topIcon">
-            <div className="ratedOption_line" />
-            <div className="ratedOption_rect" />
+        <div className="hr_wrap">
+            <div className="hr_heart" />
+            <div className="hr_bar" />
         </div>
     );
 };

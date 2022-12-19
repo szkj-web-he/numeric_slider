@@ -28,6 +28,8 @@ interface TempProps {
     selectOption?: OptionProps;
 
     setSelectOption: (res?: OptionProps) => void;
+
+    children?: React.ReactNode;
 }
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
@@ -38,6 +40,7 @@ const Temp: React.FC<TempProps> = ({
     selectOption,
     staticScoreOptions,
     setSelectOption,
+    children,
 }) => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
@@ -261,7 +264,9 @@ const Temp: React.FC<TempProps> = ({
                     className="sliderTrunk"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={handleClick}
-                />
+                >
+                    {children}
+                </div>
 
                 {scoreOptions.map((item, n) => {
                     return (
@@ -275,6 +280,7 @@ const Temp: React.FC<TempProps> = ({
                             }}
                             sibling={dragEl.current}
                             elder={deepCloneData(scoreOptions).slice(0, n)}
+                            younger={deepCloneData(scoreOptions).slice(n + 1, scoreOptions.length)}
                             handleFocused={(res) => {
                                 if (res) {
                                     setSelectOption({

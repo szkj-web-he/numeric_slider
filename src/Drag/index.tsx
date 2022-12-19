@@ -6,8 +6,8 @@
  */
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import React, { forwardRef, useEffect, useRef } from "react";
-import { Point } from "../type";
+import React, { forwardRef, useEffect, useMemo, useRef, useState } from "react";
+import { Point, ScoreOption } from "../type";
 import { getScrollValue } from "../unit";
 import { useTouch } from "./useTouch";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
@@ -30,11 +30,37 @@ interface TempProps extends React.HTMLAttributes<HTMLDivElement> {
      * 拖拽取消
      */
     handleDragCancel?: () => void;
+
+    elder: ScoreOption[];
+
+    /**
+     * 在当前节点之后的所有节点
+     */
+    younger: ScoreOption[];
+
+    sibling: Record<string, HTMLDivElement | null>;
+
+    value: number;
 }
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
 const Temp = forwardRef<HTMLDivElement, TempProps>(
-    ({ handleDragStart, handleDragMove, handleDragEnd, handleDragCancel, ...props }, ref) => {
+    (
+        {
+            handleDragStart,
+            handleDragMove,
+            handleDragEnd,
+            handleDragCancel,
+            children,
+            className,
+            elder,
+            younger,
+            value,
+            sibling,
+            ...props
+        },
+        ref,
+    ) => {
         Temp.displayName = "DragBar";
         /* <------------------------------------ **** STATE START **** ------------------------------------ */
         /************* This section will include this component HOOK function *************/
@@ -45,6 +71,14 @@ const Temp = forwardRef<HTMLDivElement, TempProps>(
             x: 0,
             y: 0,
         });
+
+        const isLast = useMemo(() => {
+            const sameScore = younger.filter((item) => item.value === value);
+            if (sameScore.length) {
+                return false;
+            }
+            return true;
+        }, [value, younger]);
 
         const globalClass = useRef<HTMLStyleElement>();
 
@@ -72,7 +106,9 @@ const Temp = forwardRef<HTMLDivElement, TempProps>(
                 globalClass.current.innerHTML = `
                 *{
                     cursor:${pointerStyle} !important;
-                }
+                }import { useState } from 'react';
+import { useMemo } from 'react';
+
                 `;
                 document.head.append(globalClass.current);
                 handleDragStart?.({
@@ -131,6 +167,12 @@ const Temp = forwardRef<HTMLDivElement, TempProps>(
                 };
             },
         );
+
+        const [margin, setMargin] = useState({
+            left: 8,
+            right: 8,
+        });
+
         /* <------------------------------------ **** STATE END **** ------------------------------------ */
         /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
         /************* This section will include this component parameter *************/
@@ -141,6 +183,47 @@ const Temp = forwardRef<HTMLDivElement, TempProps>(
                 globalClass.current = undefined;
             };
         }, []);
+
+        useEffect(() => {
+            /**
+             * 找到同一个葡萄藤上的上一个节点
+             */
+            const filterBrother = () => {
+                const sameScore = elder.filter((item) => item.value === value);
+                const endScore = sameScore.length ? sameScore[sameScore.length - 1] : undefined;
+                if (endScore) {
+                    return sibling[endScore.code];
+                }
+                return undefined;
+            };
+
+            const fn = () => {
+                const preNode = filterBrother();
+                if (preNode) {
+                    const currentRect = cRef.current?.getBoundingClientRect();
+                    const preRect = preNode.getBoundingClientRect();
+                    const left =
+                        currentRect && preRect.left > currentRect.left
+                            ? preRect.left
+                            : currentRect?.left;
+                    const right =
+                        currentRect && preRect.right > currentRect.right
+                            ? currentRect.right
+                            : preRect.right;
+
+                    setMargin({
+                        left: (left ?? 0) + 8 - (currentRect?.left ?? 0),
+                        right: (currentRect?.right ?? 0) - (right ?? 0) + 8,
+                    });
+                }
+            };
+            const timer = window.setTimeout(fn, 200);
+            return () => {
+                window.clearTimeout(timer);
+            };
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [elder, sibling, value]);
+
         /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
         /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
         /************* This section will include this component general function *************/
@@ -156,8 +239,33 @@ const Temp = forwardRef<HTMLDivElement, TempProps>(
                         (ref as React.MutableRefObject<HTMLElement | null>).current = el;
                     }
                 }}
+                className={className ? `${className} ratedOption_itemWrap` : "ratedOption_itemWrap"}
                 {...props}
-            />
+            >
+                <div
+                    className="ratedOption_itemWifi1"
+                    style={{
+                        left: `${margin.left}px`,
+                    }}
+                />
+                <div
+                    className="ratedOption_itemWifi2"
+                    style={{
+                        right: `${margin.right}px`,
+                    }}
+                />
+                <div className="ratedOption_itemTop" />
+                <div className="ratedOption_itemContainer">{children}</div>
+
+                {isLast ? (
+                    <>
+                        <div className="ratedOption_footerWifi1" />
+                        <div className="ratedOption_footerWifi2" />
+                    </>
+                ) : (
+                    <></>
+                )}
+            </div>
         );
     },
 );

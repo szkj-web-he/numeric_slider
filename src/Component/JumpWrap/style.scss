@@ -10,29 +10,28 @@
 }
 
 @mixin button {
-    flex: 0 0 auto;
-    background: #ffffff;
     width: 44px;
     height: 44px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 16px;
-    box-shadow: 0px 2.58824px 10.3529px rgba(26, 26, 26, 0.08),
-        0px 2.58824px 5.17647px rgba(26, 26, 26, 0.03);
+    background-image: url("../../Image/btn_gray.png");
+    background-color: transparent;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: 0 0;
     cursor: pointer;
+    &.active {
+        background-image: url("../../Image/btn_active.png");
+    }
 }
 
 .toTop_button {
     margin-right: 16px;
+}
+
+.jumpBottom_btn {
     @include button();
 }
 
-.toBottom_button {
+.jumpTop_btn {
     @include button();
-}
-
-.top_triangle {
     transform: rotate(180deg);
 }

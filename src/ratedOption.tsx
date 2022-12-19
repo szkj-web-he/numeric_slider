@@ -28,7 +28,12 @@ interface TempProps {
 
     getEl: (el: HTMLDivElement | null) => void;
 
+    //在当前节点之前的所有节点
     elder: ScoreOption[];
+    /**
+     * 在当前节点之后的所有节点
+     */
+    younger: ScoreOption[];
 
     sibling: Record<string, HTMLDivElement | null>;
 
@@ -45,6 +50,7 @@ const Temp: React.FC<TempProps> = ({
     scoreValue,
     handleFocused,
     elder,
+    younger,
     getEl,
     sibling,
     active,
@@ -65,10 +71,14 @@ const Temp: React.FC<TempProps> = ({
         const sameScore = elder.filter((item) => item.value === scoreValue);
 
         let height = 0;
-        const margin = 5;
+
         for (let i = 0; i < sameScore.length; i++) {
             const el = sibling[sameScore[i].code];
-            height += el?.offsetHeight ? el.offsetHeight + margin : 0;
+            if (i === 0) {
+                height += 7 + 16 + 18;
+            }
+            ++height;
+            height += el?.offsetHeight ? el.offsetHeight : 0;
         }
         return height;
     });
@@ -182,14 +192,14 @@ const Temp: React.FC<TempProps> = ({
             const sameScore = elder.filter((item) => item.value === scoreValue);
 
             let height = 0;
-            const margin = 4;
 
             for (let i = 0; i < sameScore.length; i++) {
                 const el = sibling[sameScore[i].code];
                 if (i === 0) {
-                    height += 18 + 6 + 12;
+                    height += 7 + 16 + 18;
                 }
-                height += el?.offsetHeight ? el.offsetHeight + margin : 0;
+                height += el?.offsetHeight ? el.offsetHeight : 0;
+                ++height;
             }
             return height;
         });
@@ -284,7 +294,7 @@ const Temp: React.FC<TempProps> = ({
             {show ? (
                 <>
                     <div className="ratedOption_score">{scoreValue}</div>
-                    <Icon className="ratedOption_icon" />
+                    <Icon />
                 </>
             ) : (
                 <></>
@@ -296,7 +306,11 @@ const Temp: React.FC<TempProps> = ({
                     handleDragCancel={handleDragEnd}
                     handleDragStart={handleDragStart}
                     handleDragMove={handleDragMove}
+                    elder={elder}
+                    sibling={sibling}
+                    younger={younger}
                     tabIndex={-1}
+                    value={scoreValue}
                     ref={(el) => getEl(el)}
                     onFocus={() => {
                         handleFocused(true);
