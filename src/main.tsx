@@ -6,7 +6,7 @@
  */
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { Fragment, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { comms } from ".";
 import DragHotspot from "./dragHotspot";
 import Hr from "./hr";
@@ -42,7 +42,7 @@ const Temp: React.FC = () => {
 
         for (let j = 0; j < cols.length; j++) {
             const col = cols[j];
-            const valData = scoreOptions?.find((item) => item.code === col.code);
+            const valData = scoreOptions?.find((item) => item.code === cols.code);
             data[col.code] = valData?.value ?? null;
         }
         comms.state = data;
@@ -94,7 +94,10 @@ const Temp: React.FC = () => {
                         .filter((rule) => {
                             return rule.status === 2 || rule.status === 1.5;
                         })
-                        .map((rule) => {
+                        .map((rule, n) => {
+                            if (n === 0 || n === rulerData?.[0].length - 1) {
+                                return <Fragment key={rule.left} />;
+                            }
                             return (
                                 <div
                                     className="placeBlank"
