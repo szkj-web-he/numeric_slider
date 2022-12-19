@@ -215,6 +215,11 @@ import { useMemo } from 'react';
                         left: (left ?? 0) + 8 - (currentRect?.left ?? 0),
                         right: (currentRect?.right ?? 0) - (right ?? 0) + 8,
                     });
+                } else {
+                    setMargin({
+                        left: 8,
+                        right: 8,
+                    });
                 }
             };
             const timer = window.setTimeout(fn, 200);
