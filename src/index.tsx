@@ -36,7 +36,7 @@ const Main: React.FC = () => {
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
         <div className="wrapper">
-            <JumpWrap>
+            <JumpWrap hidden={{ x: true }}>
                 <Header />
                 <MainContent />
             </JumpWrap>
