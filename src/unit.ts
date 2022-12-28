@@ -150,7 +150,7 @@ export const setScale = (): ScaleProps[] | undefined => {
     }
     const minMargin = 10;
     //页面两个的可视区域给了16的padding值
-    const padding = 16 * 2;
+    const padding = 20 * 2;
 
     const total = document.body.clientWidth - padding;
 

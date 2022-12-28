@@ -6,7 +6,7 @@
  */
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import RatedOption from "./ratedOption";
 import { OptionProps, ScoreOption, ScoreRange } from "./type";
 import { deepCloneData } from "./unit";
@@ -244,6 +244,10 @@ const Temp: React.FC<TempProps> = ({
         changeItemValue(selectOption, score);
     };
 
+    const activeScoreVal = useMemo(() => {
+        const data = scoreOptions.find((item) => item.code === selectOption?.code);
+        return data?.value;
+    }, [scoreOptions, selectOption?.code]);
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
         <div
@@ -261,7 +265,10 @@ const Temp: React.FC<TempProps> = ({
                     className="sliderTrunk"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={handleClick}
-                />
+                >
+                    <div className="sliderTrunk_start" />
+                    <div className="sliderTrunk_end" />
+                </div>
 
                 {scoreOptions.map((item, n) => {
                     return (
@@ -273,6 +280,7 @@ const Temp: React.FC<TempProps> = ({
                             getEl={(el) => {
                                 dragEl.current[item.code] = el;
                             }}
+                            activeScore={activeScoreVal}
                             sibling={dragEl.current}
                             elder={deepCloneData(scoreOptions).slice(0, n)}
                             handleFocused={(res) => {

@@ -12,6 +12,7 @@ import Icon from "./icon";
 import { Point, ScoreOption, ScoreRange } from "./type";
 import { getScrollValue } from "./unit";
 import { useHashId } from "./useHashId";
+import bottomIcon from "./Image/btn_icon2.png";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -35,6 +36,8 @@ interface TempProps {
     active: boolean;
 
     range?: ScoreRange[];
+
+    activeScore?: number;
 }
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
@@ -49,6 +52,7 @@ const Temp: React.FC<TempProps> = ({
     sibling,
     active,
     range,
+    activeScore,
 }) => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
@@ -65,9 +69,12 @@ const Temp: React.FC<TempProps> = ({
         const sameScore = elder.filter((item) => item.value === scoreValue);
 
         let height = 0;
-        const margin = 5;
+        const margin = 2;
         for (let i = 0; i < sameScore.length; i++) {
             const el = sibling[sameScore[i].code];
+            if (i === 0) {
+                height += 27 + 18 + 4;
+            }
             height += el?.offsetHeight ? el.offsetHeight + margin : 0;
         }
         return height;
@@ -182,12 +189,12 @@ const Temp: React.FC<TempProps> = ({
             const sameScore = elder.filter((item) => item.value === scoreValue);
 
             let height = 0;
-            const margin = 4;
+            const margin = 2;
 
             for (let i = 0; i < sameScore.length; i++) {
                 const el = sibling[sameScore[i].code];
                 if (i === 0) {
-                    height += 18 + 6 + 12;
+                    height += 27 + 18 + 4;
                 }
                 height += el?.offsetHeight ? el.offsetHeight + margin : 0;
             }
@@ -283,7 +290,13 @@ const Temp: React.FC<TempProps> = ({
             <div className="ratedOption_pointer" ref={point} />
             {show ? (
                 <>
-                    <div className="ratedOption_score">{scoreValue}</div>
+                    <div
+                        className={`ratedOption_score${
+                            activeScore === scoreValue ? " active" : ""
+                        }`}
+                    >
+                        {scoreValue}
+                    </div>
                     <Icon className="ratedOption_icon" />
                 </>
             ) : (
@@ -305,6 +318,9 @@ const Temp: React.FC<TempProps> = ({
                         handleFocused(false);
                     }}
                 >
+                    <div className="options_itemBg" />
+                    <div className="options_itemIconTop" />
+                    <img src={bottomIcon} className="options_itemIconBottom" alt="" />
                     <span
                         className="itemContent"
                         dangerouslySetInnerHTML={{
