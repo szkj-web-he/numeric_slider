@@ -11,6 +11,7 @@ import { comms } from ".";
 import { ScrollComponent } from "./Scroll";
 import { OptionProps, ScoreOption } from "./type";
 import { deepCloneData } from "./unit";
+import bottomIcon from "./Image/btn_icon2.png";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -67,7 +68,11 @@ const Temp: React.FC<TempProps> = ({ setList, list, setSelectOption }) => {
                         }`}
                         onClick={() => handleClick(item)}
                     >
+                        <div className="options_itemBg" />
+                        <div className="options_itemIconTop" />
+                        <img src={bottomIcon} className="options_itemIconBottom" alt="" />
                         <span
+                            className="options_itemContent"
                             dangerouslySetInnerHTML={{
                                 __html: item.content,
                             }}

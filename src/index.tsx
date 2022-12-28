@@ -43,7 +43,9 @@ const Main: React.FC = () => {
     );
     return (
         <div className="wrapper">
-            <ScrollComponent hidden={{ x: true }}>{content}</ScrollComponent>
+            <ScrollComponent hidden={{ x: true }} bodyClassName={"wrapper_scrollBody"}>
+                {content}
+            </ScrollComponent>
         </div>
     );
 };

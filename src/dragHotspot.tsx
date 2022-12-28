@@ -10,6 +10,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import RatedOption from "./ratedOption";
 import { OptionProps, ScoreOption, ScoreRange } from "./type";
 import { deepCloneData } from "./unit";
+import { useMemo } from "react";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -243,6 +244,10 @@ const Temp: React.FC<TempProps> = ({
         changeItemValue(selectOption, score);
     };
 
+    const activeScoreVal = useMemo(() => {
+        const data = scoreOptions.find((item) => item.code === selectOption?.code);
+        return data?.value;
+    }, [scoreOptions, selectOption?.code]);
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
         <div
@@ -260,7 +265,10 @@ const Temp: React.FC<TempProps> = ({
                     className="sliderTrunk"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={handleClick}
-                />
+                >
+                    <div className="sliderTrunk_start" />
+                    <div className="sliderTrunk_end" />
+                </div>
 
                 {scoreOptions.map((item, n) => {
                     return (
@@ -284,6 +292,7 @@ const Temp: React.FC<TempProps> = ({
                                     setSelectOption(undefined);
                                 }
                             }}
+                            activeScore={activeScoreVal}
                             active={item.code === selectOption?.code}
                             range={scoreRange}
                             handleScoreChange={(score) => {

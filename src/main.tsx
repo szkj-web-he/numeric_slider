@@ -17,6 +17,7 @@ import { useRef } from "react";
 import { useLayoutEffect } from "react";
 import { deepCloneData } from "./unit";
 import { useEffect } from "react";
+import Hr from "./hr";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -66,7 +67,7 @@ const Temp: React.FC = () => {
                 setSelectOption={setSelectOption}
                 list={scoreOptions}
             />
-            <div className="hr" />
+            <Hr />
             <div className="place">
                 <div className="placeTips">{comms.config.optionsInstruction}</div>
                 <Ruler ruler={rulerData?.[0]} />
