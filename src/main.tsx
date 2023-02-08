@@ -42,7 +42,7 @@ const Temp: React.FC = () => {
 
         for (let j = 0; j < cols.length; j++) {
             const col = cols[j];
-            const valData = scoreOptions?.find((item) => item.code === cols.code);
+            const valData = scoreOptions?.find((item) => item.code === col.code);
             data[col.code] = valData?.value ?? null;
         }
         comms.state = data;
